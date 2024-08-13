@@ -13,6 +13,11 @@
   },
   "type": "module",
   "workspaces": [
-    "src/creditopia_frontend"
-  ]
+    "src/frontend",
+    "src/backend_azle",
+    "src/backend_mo"
+  ],
+  "dependencies": {
+    "azle": "^0.19.0"
+  }
 }

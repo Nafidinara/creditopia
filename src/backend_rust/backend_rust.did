@@ -1,0 +1,3 @@
+service : {
+    "hobby": (text) -> (text) query;
+}

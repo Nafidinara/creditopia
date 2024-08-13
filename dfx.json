@@ -1,18 +1,40 @@
 {
   "canisters": {
-    "creditopia_backend": {
-      "main": "src/creditopia_backend/main.mo",
+    "backend_mo": {
+      "main": "src/backend_mo/main.mo",
       "type": "motoko"
     },
-    "creditopia_frontend": {
+    "backend_rust": {
+      "candid": "src/backend_rust/backend_rust.did",
+      "package": "backend_rust",
+      "type": "rust"
+    },
+    "backend_azle": {
+      "build": "npx azle backend_azle",
+      "candid": "src/backend_azle/backend_azle.did",
+      "gzip": true,
+      "main": "src/backend_azle/src/index.ts",
+      "tech_stack": {
+        "cdk": {
+          "azle": {}
+        },
+        "language": {
+          "javascript": {},
+          "typescript": {}
+        }
+      },
+      "type": "custom",
+      "wasm": ".azle/backend_azle/backend_azle.wasm"
+    },
+    "frontend": {
       "dependencies": [
-        "creditopia_backend"
+        "backend_mo"
       ],
       "source": [
-        "src/creditopia_frontend/dist"
+        "src/frontend/dist"
       ],
       "type": "assets",
-      "workspace": "creditopia_frontend"
+      "workspace": "frontend"
     }
   },
   "defaults": {
