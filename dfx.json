@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "creditopia_backend": {
+      "main": "src/creditopia_backend/main.mo",
+      "type": "motoko"
+    },
+    "creditopia_frontend": {
+      "dependencies": [
+        "creditopia_backend"
+      ],
+      "source": [
+        "src/creditopia_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "creditopia_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
