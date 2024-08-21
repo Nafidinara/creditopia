@@ -1,40 +1,13 @@
 {
   "canisters": {
-    "backend_mo": {
-      "main": "src/backend_mo/main.mo",
+    "ctICP": {
+      "main": "src/DIP20/motoko/src/token.mo",
       "type": "motoko"
     },
-    "backend_rust": {
-      "candid": "src/backend_rust/backend_rust.did",
-      "package": "backend_rust",
-      "type": "rust"
-    },
-    "backend_azle": {
-      "build": "npx azle backend_azle",
-      "candid": "src/backend_azle/backend_azle.did",
-      "gzip": true,
-      "main": "src/backend_azle/src/index.ts",
-      "tech_stack": {
-        "cdk": {
-          "azle": {}
-        },
-        "language": {
-          "javascript": {},
-          "typescript": {}
-        }
-      },
+    "ledger": {
       "type": "custom",
-      "wasm": ".azle/backend_azle/backend_azle.wasm"
-    },
-    "frontend": {
-      "dependencies": [
-        "backend_mo"
-      ],
-      "source": [
-        "src/frontend/dist"
-      ],
-      "type": "assets",
-      "workspace": "frontend"
+      "candid": "src/ledger/ledger.did",
+      "wasm": "src/ledger/ledger.wasm"
     }
   },
   "defaults": {
