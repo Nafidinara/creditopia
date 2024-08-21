@@ -1,0 +1,7 @@
+{
+  "canisters": {
+    "DIP20": {
+      "main": "src/token.mo"
+    }
+  }
+}
