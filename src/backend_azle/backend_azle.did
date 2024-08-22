@@ -1,3 +1,0 @@
-service: () -> {
-    makan: (text) -> (text) query;
-}
