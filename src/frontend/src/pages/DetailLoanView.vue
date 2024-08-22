@@ -160,13 +160,21 @@ import MeterGroup from 'primevue/metergroup';
 import SelectButton from '../components/SelectButton.vue';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter , useRoute} from 'vue-router';
+import { loan } from 'declarations/loan/index';
 
 const valueSelect = ref('Supply');
 const optionsSelect = ref(['Supply', 'Claim']);
 
 const router = useRouter()
+const route = useRoute()
+onMounted(async () => {
+  await loan.getLoan(parseFloat(route.params.id)).then((response) =>{
+    // create session here
+    console.log(response, "user ada")
+  })
+})
 
 const data = ref([
   {
