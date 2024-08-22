@@ -1,0 +1,46 @@
+dfx deploy icp_ledger_canister --argument "(variant {
+    Init = record {
+      minting_account = \"$(dfx ledger --identity anonymous account-id)\";
+      initial_values = vec {
+        record {
+          \"$(dfx ledger --identity default account-id)\";
+          record {
+            e8s = 10_000_000_000 : nat64;
+          };
+        };
+      };
+      send_whitelist = vec {};
+      transfer_fee = opt record {
+        e8s = 10_000 : nat64;
+      };
+      token_symbol = opt \"LICP\";
+      token_name = opt \"Local ICP\";
+    }
+  })
+"
+
+
+TRANSFER KE WALLET:
+WALLET_ACCOUNT_ID="$(dfx ledger account-id --of-canister wallet)"
+WALLET_ACCOUNT_ID_BYTES="$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$WALLET_ACCOUNT_ID'")]) + "}")')"
+dfx canister --identity default call icp_ledger_canister transfer "(record { to = ${WALLET_ACCOUNT_ID_BYTES}; memo = 1; amount = record { e8s = 2_00_000_000 }; fee = record { e8s = 10_000 }; })"
+
+LENDER_ACCOUNT_ID="$(dfx ledger account-id --of-canister LENDER)"
+LENDER_ACCOUNT_ID_BYTES="$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$LENDER_ACCOUNT_ID'")]) + "}")')"
+dfx canister --identity default call icp_ledger_canister transfer "(record { to = ${LENDER_ACCOUNT_ID_BYTES}; memo = 1; amount = record { e8s = 2_00_000_000 }; fee = record { e8s = 10_000 }; })"
+
+BITFINITY_WALLET_ID="9639db403159fe40c42b0c6090283946588e12fb76e4c1128a6638b4d96f261e"
+BITFINITY_WALLET_ID_BYTES="$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$BITFINITY_WALLET_ID'")]) + "}")')"
+dfx canister --identity default call icp_ledger_canister transfer "(record { to = ${BITFINITY_WALLET_ID_BYTES}; memo = 1; amount = record { e8s = 2_00_000_000 }; fee = record { e8s = 10_000 }; })"
+
+TRANSFER DARI WALLET:
+dfx canister call icp_transfer_backend transfer "(record { amount = record { e8s = 100_000_000 }; toPrincipal = principal \"$(dfx identity --identity default get-principal)\"})"
+
+CALL PAKE IDENTITY
+dfx canister --identity default call loan lendToLoan '(2:nat, 10:nat64)'
+dfx canister --identity default call loan registerLoan '("Event Coinfest 2024":text, "description of coinfest":text, "Events":text, 100:nat64, 90:nat, 30:nat, 12.0:float64)'
+
+CEK ACCOUNT BALANCE:
+dfx canister call icp_ledger_canister account_balance '(record { account = '$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$(dfx ledger --identity default account-id)'")]) + "}")')'})'
+dfx canister call icp_ledger_canister account_balance '(record { account = '$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$(dfx ledger --identity wallet account-id)'")]) + "}")')'})'
+dfx canister call icp_ledger_canister account_balance '(record { account = '$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$(dfx ledger --identity {NAMA AKUN} account-id)'")]) + "}")')'})'
