@@ -37,6 +37,10 @@ import Button from 'primevue/button';
 import { ref } from 'vue';
 import { user } from 'declarations/user/index';
 
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
 let principal = ref('')
 const name = ref('');
 const email = ref('');
@@ -76,11 +80,12 @@ const createAccount = async () => {
     console.log('Account data:', accountData);
     
     // Example: Call to a backend API or smart contract
-   await user.create_user(principal,name.value,email.value,phoneNumber.value,address.value);
+    await user.create_user(principal,name.value,email.value,phoneNumber.value,address.value);
+
+    // create session here
   //  console.log(user)
 
   } catch (error) {
     console.log(error)
   }
 }
-</script>
