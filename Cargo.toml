@@ -1,5 +1,5 @@
 [workspace]
 members = [
-    "src/backend_rust"
+    "src/user"
 ]
 resolver = "2"

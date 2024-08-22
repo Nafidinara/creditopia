@@ -4,28 +4,35 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "setup": "npm i && dfx canister create backend_mo && dfx generate backend_mo && dfx deploy",
+    "setup": "npm i && dfx canister create frontend && dfx generate frontend && dfx deploy",
     "start": "vite --port 3000",
     "prebuild": "dfx generate",
     "build": "tsc && vite build",
     "format": "prettier --write \"src/**/*.{json,js,jsx,ts,tsx,css,scss}\""
   },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@dfinity/agent": "^0.15.7",
-    "@dfinity/candid": "^0.15.7",
-    "@psychedelic/plug-connect": "^0.2.0",
-    "@dfinity/principal": "^0.15.7"
-  },
   "devDependencies": {
-    "@types/react": "^18.2.14",
-    "@types/react-dom": "^18.2.6",
-    "@vitejs/plugin-react": "^4.0.1",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/tsconfig": "^0.4.0",
+    "autoprefixer": "^10.4.20",
     "dotenv": "^16.3.1",
+    "postcss": "^8.4.41",
+    "prettier": "^2.8.8",
     "sass": "^1.63.6",
+    "tailwindcss": "^3.4.10",
     "typescript": "^5.1.3",
     "vite": "^4.3.9",
     "vite-plugin-environment": "^1.1.3"
+  },
+  "dependencies": {
+    "@dfinity/agent": "^1.4.0",
+    "@dfinity/candid": "^1.4.0",
+    "@dfinity/principal": "^1.4.0",
+    "@primevue/themes": "^4.0.4",
+    "pinia": "^2.1.6",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.0.4",
+    "tailwindcss-primeui": "^0.3.4",
+    "vue": "^3.3.4",
+    "vue-router": "^4.4.3"
   }
 }
