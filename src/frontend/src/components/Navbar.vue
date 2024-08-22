@@ -14,22 +14,27 @@
       </div>
     </template>
     <template #item="{ item, props, hasSubmenu, root }">
-      <a v-ripple class="flex items-center" v-bind="props.action">
+      <a v-ripple class="flex items-center" :class="{ 'active-item': route.path.includes(item.route) }" v-bind="props.action"
+        :href="item.route">
         <span class="text-[#aaa]">{{ item.label }}</span>
-        <Badge v-if="item.badge" :class="{ 'ml-auto': !root, 'ml-2': root }" :value="item.badge" />
-        <span v-if="item.shortcut"
-          class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut
-          }}</span>
-        <i v-if="hasSubmenu"
-          :class="['pi pi-angle-down', { 'pi-angle-down ml-2': root, 'pi-angle-right ml-auto': !root }]"></i>
       </a>
+    </template>
+    <template #end>
+      <div class="flex gap-4 items-center border border-gray-600 rounded-lg  py-2 px-3">
+        <Avatar label="KH" style="background-color: #dee9fc; color: #1a2551" />
+        <h1>Ken Hiller</h1>
+      </div>
     </template>
   </Menubar>
 </template>
 
 <script setup>
-import Menubar from 'primevue/menubar';
 import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+import Menubar from 'primevue/menubar';
+import Avatar from 'primevue/avatar';
+
+const route = useRoute()
 
 const items = ref([
   {
@@ -50,3 +55,23 @@ const items = ref([
   }
 ]);
 </script>
+
+<style scoped>
+.active-item {
+  display: block;
+  position: relative;
+}
+
+.active-item:after {
+  display: block;
+  margin: 0 auto;
+  position: absolute;
+  left: 40%;
+  bottom: 0;
+  content: '';
+  height: 4px;
+  width: 12px;
+  border-radius: 12px;
+  background-color: #3A6BD5;
+}
+</style>

@@ -23,7 +23,7 @@
           <label for="adress" class="text-sm text-[#AAA]">Adress</label>
           <InputText id="adress" placeholder="Enter your address" />
         </div>
-        <Button label="Sign Up" fluid class="mt-[40px]" severity="contrast" />
+        <Button label="Sign Up" fluid class="mt-[40px]" severity="contrast" @click="router.push('/loans')"/>
       </div>
     </div>
   </div>
@@ -32,4 +32,8 @@
 <script setup>
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
 </script>
