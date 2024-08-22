@@ -43,11 +43,9 @@ type Error = record {
 type User = record {
   id: text;
   name: text;
-  types: text;
   email: text;
   phone: text;
   address: text;
-  status: Status;
 };
 service : {
     "detect": (image: blob) -> (Detection) query;
@@ -68,7 +66,7 @@ service : {
     // User
 
     // Create a new user
-    create_user: (text, text, text, text, text, text) -> (variant { Ok; Err: text });
+    create_user: (id: text, name: text, email: text, phone: text, address: text ) -> (variant { Ok; Err: text });
     get_user: (text) -> (opt User) query;
     update_user: (text, text) -> (variant { Ok; Err: text });
     delete_user: (text) -> (variant { Ok; Err: text });

@@ -66,7 +66,6 @@ enum Status {
 struct User {
     id: String,
     name: String,
-    types: String,
     email: String,
     phone: String,
     address: String,
@@ -172,7 +171,6 @@ fn post_upgrade() {
 fn create_user(
     id: String,
     name: String,
-    types: String,
     email: String,
     phone: String,
     address: String,
@@ -198,11 +196,18 @@ fn create_user(
     //     Status::Failed
     // };
 
+    let user_exists = USERS.with(|users| {
+        users.borrow().iter().any(|user| user.id == id)
+    });
+
+    if user_exists {
+        return Err("User with this ID already exists.".to_string());
+    }
+
     // Create the user with the determined status
     let user = User {
         id,
         name,
-        types,
         email,
         phone,
         address,
