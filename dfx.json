@@ -7,7 +7,9 @@
     "backend_rust": {
       "candid": "src/backend_rust/backend_rust.did",
       "package": "backend_rust",
-      "type": "rust"
+      "type": "custom",
+      "wasm": "target/wasm32-wasi/release/backend_rust-ic.wasm",
+      "build": [ "bash build.sh" ]
     },
     "backend_azle": {
       "build": "npx azle backend_azle",
