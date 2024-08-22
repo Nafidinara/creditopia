@@ -8,7 +8,7 @@
     }
   }">
     <template #start>
-      <div class="flex gap-4 items-center">
+      <div class="flex gap-4 items-center cursor-pointer" @click="router.push('/')">
         <img src="/icons/logo.svg" alt="logo" width="32" />
         <h1 class="text-lg">Creditopia</h1>
       </div>
@@ -30,11 +30,12 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import Menubar from 'primevue/menubar';
 import Avatar from 'primevue/avatar';
 
 const route = useRoute()
+const router = useRouter()
 
 const items = ref([
   {

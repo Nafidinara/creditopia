@@ -33,6 +33,7 @@
     "primevue": "^4.0.4",
     "tailwindcss-primeui": "^0.3.4",
     "vue": "^3.3.4",
+    "vue-countup-v3": "^1.4.2",
     "vue-router": "^4.4.3"
   }
 }
