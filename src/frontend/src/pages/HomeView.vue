@@ -56,6 +56,11 @@ const connectToWallet = async () => {
       const userPrincipal = await window.ic.infinityWallet.getPrincipal();
       principal = userPrincipal.toString();
       console.log(userPrincipal.toString());
+
+     await user.get_user(userPrincipal.toString()).then((response) =>{
+        // create session here
+        console.log(response,length > 0, "user ada")
+      })
     } else {
       console.error('Bitfinity wallet is not installed or not available.');
     }
@@ -67,6 +72,8 @@ const connectToWallet = async () => {
 const createAccount = async () => {
   try {
     
+
+
     // Use the collected input values
     const accountData = {
       id: principal,
@@ -83,7 +90,7 @@ const createAccount = async () => {
     await user.create_user(principal,name.value,email.value,phoneNumber.value,address.value);
 
     // create session here
-  //  console.log(user)
+    //  console.log(user)
 
   } catch (error) {
     console.log(error)
