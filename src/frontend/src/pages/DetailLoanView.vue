@@ -10,40 +10,36 @@
           <div class="flex gap-2">
             <img src="/icons/course.png" alt="market">
             <div>
-              <p class="text-base">Event Course</p>
+              <p class="text-base">{{ title }}</p>
               <p class="text-xs text-[#AAA] mt-1">Event Professional Organizer</p>
             </div>
           </div>
-          <Tag severity="secondary" value="Event" />
+          <Tag severity="secondary" :value="category" />
         </div>
         <div class="mt-4 px-4 pb-4 border-b border-gray-600">
           <p class="text-sm font-bold">Description</p>
-          <p class="mt-3 text-[#AAA]">Event Course is an innovative SME that specializes in creating immersive and
-            educational
-            event-based learning experiences. We bridge the gap between traditional education and experiential learning
-            by offering customized courses designed around dynamic events, workshops, and seminars. Our mission is to
-            enhance learning outcomes by providing participants with hands-on, real-world experiences that complement
-            theoretical knowledge.</p>
+          <p class="mt-3 text-[#AAA]">
+          {{description}}</p>
         </div>
         <div class="mt-4 px-4 pb-4 border-b border-gray-600">
           <div class="grid grid-cols-12">
             <div class="col-span-4">
               <p class="text-xs text-[#BDD4FF]">Dana yang Dibutuhkan</p>
-              <p class="text-2xl mt-2">564,356 ICP</p>
+              <p class="text-2xl mt-2">{{totalAmount}} ICP</p>
             </div>
             <div class="col-span-4">
               <p class="text-xs text-[#BDD4FF]">Interest</p>
-              <p class="text-2xl mt-2">15%</p>
+              <p class="text-2xl mt-2">{{interest}}%</p>
             </div>
             <div class="col-span-4 text-right">
-              <p class="text-sm">282,173 CP <span class="text-[#aaa]">| 564,356 ICP</span></p>
-              <p class="text-[#aaa] text-xs mt-2">50% remaining</p>
+              <p class="text-sm">{{fundedAmount}} CP <span class="text-[#aaa]">| {{totalAmount}} ICP</span></p>
+              <p class="text-[#aaa] text-xs mt-2">{{Number(fundedAmount) / Number(totalAmount) * 100}}% remaining</p>
             </div>
           </div>
           <div
             class="flex justify-between mt-4 py-2 px-3 border border-gray-600 rounded bg-gradient-to-r from-gray-900">
             <p class="text-sm">Payment period</p>
-            <p class="text-bold text-sm">6 Month</p>
+            <p class="text-bold text-sm" v-if="tenor">{{ Math.floor(Number(tenor) / 30) }} Month</p>
           </div>
         </div>
         <div class="mt-4 px-4 pb-4 border-b border-gray-600">
@@ -58,7 +54,7 @@
           }" />
         </div>
         <div class="mt-4 px-4 pb-4 border-b border-gray-600">
-          <p class="text-sm font-bold">The Lender (6)</p>
+          <p class="text-sm font-bold">The Lender ({{lender.length}})</p>
           <div class="grid grid-cols-12 gap-4 mt-4">
             <div class="col-span-3">
               <div
@@ -167,12 +163,30 @@ import { loan } from 'declarations/loan/index';
 const valueSelect = ref('Supply');
 const optionsSelect = ref(['Supply', 'Claim']);
 
+const title = ref('')
+const description = ref('')
+const interest = ref(null)
+const totalAmount = ref(null)
+const fundedAmount = ref(null)
+const tenor = ref(null)
+const category = ref(null)
+
+const lender = ref(null)
 const router = useRouter()
 const route = useRoute()
+
 onMounted(async () => {
   await loan.getLoan(parseFloat(route.params.id)).then((response) =>{
     // create session here
     console.log(response, "user ada")
+    title.value = response.ok.title
+    description.value = response.ok.description
+    category.value = response.ok.category
+    interest.value = response.ok.interestRate
+    totalAmount.value = response.ok.totalAmount
+    fundedAmount.value = response.ok.fundedAmount
+    tenor.value = response.ok.tenor
+    lender.value = response.ok.lenders
   })
 })
 
