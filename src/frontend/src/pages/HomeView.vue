@@ -89,3 +89,5 @@ const createAccount = async () => {
     console.log(error)
   }
 }
+
+</script>
