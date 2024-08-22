@@ -48,12 +48,12 @@ const phoneNumber = ref('');
 const address = ref('');
 const connectToWallet = async () => {
   try {
-   if (window.ic && window.ic.infinityWallet) {
+   if (window.ic && window.ic.plug) {
       // Request connection to the Bitfinity wallet
-      await window.ic.infinityWallet.requestConnect();
+      await window.ic.plug.requestConnect();
 
       // Get the principal string
-      const userPrincipal = await window.ic.infinityWallet.getPrincipal();
+      const userPrincipal = await window.ic.plug.agent.getPrincipal();
       principal = userPrincipal.toString();
       console.log(userPrincipal.toString());
 
