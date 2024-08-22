@@ -5,7 +5,9 @@
       "package": "user",
       "type": "custom",
       "wasm": "target/wasm32-wasi/release/user-ic.wasm",
-      "build": [ "bash build.sh" ]
+      "build": [
+        "bash build.sh"
+      ]
     },
     "CDTP": {
       "type": "custom",
@@ -25,6 +27,25 @@
       ],
       "type": "assets",
       "workspace": "frontend"
+    },
+    "invoice": {
+      "main": "src/backend_mo/invoice.mo",
+      "type": "motoko"
+    },
+    "loan": {
+      "main": "src/backend_mo/loan.mo",
+      "type": "motoko",
+      "dependencies": ["icp_ledger_canister"]
+    },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/1ac5439c6da1aafe8156c667c313344c0245fea3/rs/rosetta-api/icp_ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/1ac5439c6da1aafe8156c667c313344c0245fea3/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      }
     }
   },
   "defaults": {
