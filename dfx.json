@@ -1,16 +1,26 @@
 {
   "canisters": {
-    "backend_rust": {
-      "candid": "src/backend_rust/backend_rust.did",
-      "package": "backend_rust",
+    "user": {
+      "candid": "src/user/user.did",
+      "package": "user",
       "type": "custom",
-      "wasm": "target/wasm32-wasi/release/backend_rust-ic.wasm",
+      "wasm": "target/wasm32-wasi/release/user-ic.wasm",
       "build": [ "bash build.sh" ]
     },
     "CDTP": {
       "type": "custom",
       "candid": "src/icrc_ledger/icrc_ledger.did",
       "wasm": "src/icrc_ledger/icrc_ledger.wasm"
+    },
+    "frontend": {
+      "dependencies": [
+        "user"
+      ],
+      "source": [
+        "src/frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "frontend"
     }
   },
   "defaults": {
