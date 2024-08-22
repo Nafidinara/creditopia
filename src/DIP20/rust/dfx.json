@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "canisters": {
+    "token": {
+      "package": "token",
+      "candid": "token/token.did",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  }
+}
