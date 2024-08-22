@@ -128,13 +128,14 @@
                   playsinline></video>
                 <canvas id="canvas" ref="canvasRef" :class="{ hidden: !state.isCanvasVisible }"
                   class="w-full rounded-lg"></canvas>
-                <Button @click="store" label="Take Photo" fluid class="mt-[40px]" severity="contrast" />
+                <Button @click="recognize" label="Take Photo" fluid class="mt-[40px]" severity="contrast" />
                 <Button @click="restart" label="Retake Photo" fluid class="mt-[40px]" severity="contrast" />
               </div>
               {{ state.message }}
             </div>
           </div>
-          <Button @click="create" label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
+          <Button @click="create" :disabled="disableButton" label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
+          {{ authStore.user }}
         </div>
       </div>
     </div>
@@ -151,8 +152,10 @@ import Button from 'primevue/button';
 import { useRouter } from 'vue-router';
 import { user } from 'declarations/user/index';
 import { loan } from 'declarations/loan/index';
-
+import { useAuthStore } from '../stores/auth';
+import { Principal } from '@dfinity/principal';
 const router = useRouter();
+const authStore = useAuthStore();
 
 const name = ref('');
 const description = ref('');
@@ -164,6 +167,7 @@ const amount = ref(0);
 const commit = ref(null);
 
 const photo = ref(null)
+const disableButton = ref(false)
 
 const categories = ref([
   { name: 'F&B', code: 'F&B' },
@@ -274,6 +278,7 @@ const onChangeUploadPhoto = async (e) => {
   }
   photo.value = await toDataURL(file)
   console.log(photo.value)
+  store()
 }
 
 const recognize = async (event) => {
@@ -285,7 +290,7 @@ const recognize = async (event) => {
   try {
     const [blob, scaling] = await captureImage();
     let result = await user.detect(new Uint8Array(blob));
-
+    console.log(result,"Result blob")
     if (!result.Ok) throw new Error(result.Err.message);
 
     const face = await render(scaling, result.Ok);
@@ -297,9 +302,11 @@ const recognize = async (event) => {
     const label = sanitize(result.Ok.label);
     const score = Math.round(result.Ok.score * 100) / 100;
     state.message = `${label}, difference=${score}`;
+    console.log(label,score)
   } catch (err) {
     console.error(`An error occurred: ${err}`);
     state.message = err.toString();
+    disableButton.value = true
   }
 
   state.isLoaderVisible = false;
@@ -307,7 +314,7 @@ const recognize = async (event) => {
 };
 
 const store = async (event) => {
-  event.preventDefault();
+  // event.preventDefault();
   state.isButtonsVisible = false;
   state.isLoaderVisible = true;
   state.message = 'Detecting face..';
@@ -319,7 +326,7 @@ const store = async (event) => {
     if (!result.Ok) throw new Error(result.Err.message);
 
     const face = await render(scaling, result.Ok);
-    const label = prompt('Enter name of the person');
+    const label = authStore.user.name
     console.log(face, "Face")
     if (!label) throw new Error('Cannot add without a name');
 
@@ -453,7 +460,7 @@ const create = async () => {
   const diffDaysWait = Math.ceil(waitingTime / (1000 * 60 * 60 * 24));
   console.log(diffDaysWait)
   console.log(name.value, description.value, category.value.code, parseFloat(amount.value), diffDays, diffDaysWait, parseFloat(interest.value.code))
-  loan.registerLoan(name.value, description.value, category.value.code, parseFloat(amount.value), diffDays, diffDaysWait, parseFloat(interest.value.code)).then((res) => {
+  loan.registerLoan(Principal.fromText(authStore.principalId) ,name.value, description.value, category.value.code, parseFloat(amount.value), diffDays, diffDaysWait, parseFloat(interest.value.code)).then((res) => {
     console.log(res)
   })
 }
