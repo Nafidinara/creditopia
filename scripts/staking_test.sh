@@ -26,7 +26,7 @@ dfx canister call --identity staker CDTP icrc2_approve "(
 echo "done approve"
 
 #staker doing staking
-dfx canister call staking deposit '(10000000, 1)'
+dfx canister call staking deposit '(10000000, 0)'
 
 echo "Staker balance after deposit: $(dfx canister call CDTP icrc1_balance_of "(record {owner = principal \"${STAKER_ID}\"; })")"
 echo "Staking platform balance after deposit: $(dfx canister call CDTP icrc1_balance_of "(record {owner = principal \"$(dfx canister id staking)\"; })")"

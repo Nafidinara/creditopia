@@ -22,14 +22,17 @@ actor StakingPlatform {
         withdrawn: Bool;
     };
 
+    let nanosecondsInADay : Nat = 24 * 60 * 60 * 1_000_000_000;
+
     // Storage for all stakes
     var stakes: [StakeData] = [];
 
     // Daily reward rates based on lock periods
     let dailyRewardRates: [(Nat, Nat)] = [
-        (1 * 86400, 2),   // 1 day = 86400 seconds, daily reward = 2%
-        (3 * 86400, 5),   // 3 days, daily reward = 5%
-        (10 * 86400, 10)  // 10 days, daily reward = 10%
+        (1 * nanosecondsInADay, 2),   // 1 day = 86400 seconds, daily reward = 2%
+        (3 * nanosecondsInADay, 5),   // 3 days, daily reward = 5%
+        (10 * nanosecondsInADay, 10),  // 10 days, daily reward = 10%
+        (0 * nanosecondsInADay, 10)  // 0 days, daily reward = 10% just for testing
     ];
 
     // Function to deposit (stake) CDTP tokens
@@ -37,7 +40,7 @@ actor StakingPlatform {
         // Find the daily reward rate based on lock period
         let filteredRates = Iter.filter<(Nat, Nat)>(
             Iter.fromArray(dailyRewardRates), 
-            func(pair: (Nat, Nat)): Bool { pair.0 == lockDays * 86400 }
+            func(pair: (Nat, Nat)): Bool { pair.0 == lockDays * nanosecondsInADay }
         );
 
         let ratesArray = Iter.toArray(filteredRates);
@@ -74,9 +77,9 @@ actor StakingPlatform {
         // Add the stake data
         let newStake = {
             user = caller;
-            amount = amount;
+            amount;
             startTime = Time.now();
-            lockPeriod = lockDays * 86400; // Convert days to seconds
+            lockPeriod = lockDays * nanosecondsInADay; // Convert days to seconds
             dailyRewardRate = dailyRewardRate;
             withdrawn = false;
         };
@@ -88,7 +91,7 @@ actor StakingPlatform {
     // Function to calculate the total reward based on staking period
     private func calculateReward(stake: StakeData, currentTime: Time.Time): Nat {
         let elapsedTime = currentTime - stake.startTime;
-        let daysStaked: Nat = Int.abs(elapsedTime / 86400);
+        let daysStaked: Nat = Int.abs(elapsedTime / nanosecondsInADay)+1;
 
         // Calculate reward as Nat
         let reward: Nat = (stake.amount * stake.dailyRewardRate * daysStaked) / 100;
@@ -107,12 +110,28 @@ actor StakingPlatform {
                 return "No active stake found or stake already withdrawn.";
             };
             case (?userStake) {
+                
+                Debug.print(
+                "Current time "
+                # debug_show (currentTime)
+                # "Start time"
+                # debug_show (userStake.startTime)
+                # "Lock Period"
+                # debug_show (userStake.lockPeriod)
+                # "User stake"
+                # debug_show (userStake)
+                );
                 if (currentTime < userStake.startTime + userStake.lockPeriod) {
                     return "Cannot withdraw before the lock period ends.";
                 };
 
                 let reward = calculateReward(userStake, currentTime);
                 let totalAmount = userStake.amount + reward;
+
+                Debug.print(
+                    "Total AMount"
+                    # debug_show(totalAmount)
+                );
 
                 let transferArgs : CDTP.TransferArg = {
                 // can be used to distinguish between transactions
