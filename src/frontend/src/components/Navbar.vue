@@ -51,7 +51,7 @@ const items = ref([
   },
   {
     label: 'My accounts',
-    route: '/my-accounts'
+    route: '/my-account'
   }
 ]);
 </script>

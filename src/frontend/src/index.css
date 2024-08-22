@@ -1,4 +1,21 @@
 /* ./src/index.css */
+:root {
+  --primary-color: #3A6BD5 !important;
+  --primary-color-text: #fff; /* Text color when using primary color */
+  --primary-light: #5B86E5; /* Lighter shade for hover states */
+  --primary-dark: #274B9C; /* Darker shade for active states */
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-tabs .p-tab-active {
+  color: white !important;
+  border-color: #366E96 !important;
+}
+
+.custom-tabs .p-tablist-active-bar {
+  background: #366E96 !important;
+  border-color: #366E96 !important;
+  height: 4px !important;
+}
