@@ -1,3 +1,0 @@
-[submodule "rust/cap"]
-	path = rust/cap
-	url = https://github.com/Psychedelic/cap.git
