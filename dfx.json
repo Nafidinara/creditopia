@@ -7,6 +7,11 @@
       "wasm": "target/wasm32-wasi/release/user-ic.wasm",
       "build": [ "bash build.sh" ]
     },
+    "CDTP": {
+      "type": "custom",
+      "candid": "src/icrc_ledger/icrc_ledger.did",
+      "wasm": "src/icrc_ledger/icrc_ledger.wasm"
+    },
     "frontend": {
       "dependencies": [
         "user"
