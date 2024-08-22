@@ -103,29 +103,35 @@
               <label for="face" class="text-sm text-[#AAA]">Upload your Face Photo</label>
               <div class="w-full mt-2">
                 <label
-                  class="flex justify-center w-full h-40 px-4 transition bg-[#0B0B13] border-2 border-gray-600 rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
-                  <div class="flex items-center flex-col justify-center gap-2">
+                  class="flex justify-center w-full h-[244px] px-4 transition bg-[#0B0B13] border-2 border-gray-600 rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
+                  <div class="flex items-center flex-col justify-center gap-2" v-if="!photo">
                     <img src="/icons/file.svg" alt="file">
                     <p class="text-[#838386] text-xs text-center">Drop .png / .svg / .jpg image format or <span
                         class="text-[#82A9FF]">Browse
                         Here</span></p>
                     <p class="text-[#838386] text-xs text-center">Photo size ratio is 1:1</p>
                   </div>
-                  <input type="file" name="file_upload" class="hidden" ref="file">
+                  <div class="flex flex-col items-center" v-else>
+                    <img :src="photo" alt="photo" class="h-[150px] mt-4 rounded-lg">
+                    <p class="mt-3 text-sm text-[#82A9FF]">Change Photo</p>
+                  </div>
+                  <input type="file" name="file_upload" class="hidden" ref="file" @change="onChangeUploadPhoto">
                 </label>
               </div>
             </div>
             <div class="col-span-6">
               <label for="face" class="text-sm text-[#AAA]">Take photo of your face</label>
               <div class="mt-2">
-                <img id="image" ref="imageRef" :src="imageSrc" :class="{ hidden: !state.isImageVisible }"
+                <img id="image" ref="imageRef" :class="{ hidden: !state.isImageVisible }"
                   alt="Placeholder" class="rounded-lg" />
                 <video id="video" ref="videoRef" :class="{ hidden: !state.isVideoVisible }" class="rounded-lg"
                   playsinline></video>
-                <canvas id="canvas" ref="canvasRef" :class="{ hidden: !state.isCanvasVisible }" class="w-full rounded-lg"></canvas>
+                <canvas id="canvas" ref="canvasRef" :class="{ hidden: !state.isCanvasVisible }"
+                  class="w-full rounded-lg"></canvas>
                 <Button @click="store" label="Take Photo" fluid class="mt-[40px]" severity="contrast" />
                 <Button @click="restart" label="Retake Photo" fluid class="mt-[40px]" severity="contrast" />
               </div>
+              {{ state.message }}
             </div>
           </div>
           <Button @click="create" label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
@@ -156,6 +162,8 @@ const endDuration = ref(null);
 const category = ref(null);
 const amount = ref(0);
 const commit = ref(null);
+
+const photo = ref(null)
 
 const categories = ref([
   { name: 'F&B', code: 'F&B' },
@@ -258,6 +266,15 @@ const selectVisibleElement = () => {
     return [canvas, canvas.width, canvas.height];
   }
 };
+
+const onChangeUploadPhoto = async (e) => {
+  const file = e.target.files[0]
+  if (typeof file === 'undefined') {
+    return
+  }
+  photo.value = await toDataURL(file)
+  console.log(photo.value)
+}
 
 const recognize = async (event) => {
   event.preventDefault();
