@@ -1,4 +1,5 @@
 <template>
+  <Toast />
   <div class="container mx-auto">
     <h1 class="text-[48px] mt-[88px] text-center">Empowering SMEs with Innovative Lending <br>
       for <span class="text-[#82A9FF]">Real-World Impact</span></h1>
@@ -7,20 +8,25 @@
       <div class="col-span-10 flex items-center">
         <div class="flex-1 text-center flex flex-col items-center">
           <p class="text-[#82A9FF] text-sm">Total Borrow</p>
-          <p class="text-[28px] font-bold mt-3 flex items-center gap-3"><count-up :end-val="567"></count-up> <span class="text-xl font-normal">ICP</span></p>
+          <p class="text-[28px] font-bold mt-3 flex items-center gap-3"><count-up :end-val="567"></count-up> <span
+              class="text-xl font-normal">ICP</span></p>
         </div>
         <div class="flex-1 text-center border-l border-gray-600 border-r flex flex-col items-center">
           <p class="text-[#82A9FF] text-sm">Total Loan</p>
-          <p class="text-[28px] font-bold mt-3 flex items-center gap-3"><count-up :end-val="4356"></count-up> <span class="text-xl font-normal">ICP</span></p>
+          <p class="text-[28px] font-bold mt-3 flex items-center gap-3"><count-up :end-val="4356"></count-up> <span
+              class="text-xl font-normal">ICP</span></p>
         </div>
         <div class="flex-1 text-center flex flex-col items-center">
           <p class="text-[#82A9FF] text-sm">Total Value Locket (TVL)</p>
-          <p class="text-[28px] font-bold mt-3 flex items-center gap-3"><count-up :end-val="12879"></count-up> <span class="text-xl font-normal">ICP</span></p>        </div>
+          <p class="text-[28px] font-bold mt-3 flex items-center gap-3"><count-up :end-val="12879"></count-up> <span
+              class="text-xl font-normal">ICP</span></p>
+        </div>
       </div>
       <div class="col-span-1"></div>
     </div>
     <div class="flex justify-center">
-      <Button label="Connect with Internet Identity" class="mt-[40px]" severity="contrast" />
+      <Button label="Connect with Internet Identity" class="mt-[40px]" severity="contrast"
+        @click="onClickConnectWallet" />
     </div>
     <div class="grid grid-cols-12 mt-[120px]">
       <div class="col-span-7">
@@ -169,5 +175,16 @@
 <script setup>
 import Button from 'primevue/button';
 import CountUp from 'vue-countup-v3'
+import { useAuthStore } from '../stores/auth';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
+const authStore = useAuthStore()
+
+const toast = useToast()
+
+const onClickConnectWallet = async () => {
+  await authStore.connectToWallet()
+  toast.add({ ...authStore.status })
+};
 </script>

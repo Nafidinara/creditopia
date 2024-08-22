@@ -1,4 +1,5 @@
 <template>
+  <Toast/>
   <div class="min-h-screen w-full flex justify-center items-start pt-[100px]">
     <div class="w-[485px] py-[48px] px-[64px] bg-[#16161E] rounded-lg">
       <div class="flex flex-col items-center text-center">
@@ -24,8 +25,6 @@
           <InputText v-model="address" id="adress" placeholder="Enter your address" />
         </div>
         <Button @click="createAccount" label="Sign Up" fluid class="mt-[40px]" severity="contrast" />
-        <Button @click="connectToWallet" label="Connect" fluid class="mt-[40px]" severity="contrast" />
-
       </div>
     </div>
   </div>
@@ -35,62 +34,30 @@
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import { ref } from 'vue';
-import { user } from 'declarations/user/index';
+import Toast from 'primevue/toast';
+import { useAuthStore } from '../stores/auth';
+import { useToast } from 'primevue/usetoast';
 
-import { useRouter } from 'vue-router';
-
-const router = useRouter()
-
-let principal = ref('')
 const name = ref('');
 const email = ref('');
 const phoneNumber = ref('');
 const address = ref('');
-const connectToWallet = async () => {
-  try {
-   if (window.ic && window.ic.plug) {
-      // Request connection to the Bitfinity wallet
-      await window.ic.plug.requestConnect();
 
-      // Get the principal string
-      const userPrincipal = await window.ic.plug.agent.getPrincipal();
-      principal = userPrincipal.toString();
-      console.log(userPrincipal.toString());
+const toast = useToast()
 
-     await user.get_user(userPrincipal.toString()).then((response) =>{
-        // create session here
-        console.log(response,length > 0, "user ada")
-      })
-    } else {
-      console.error('Bitfinity wallet is not installed or not available.');
-    }
-  } catch (error) {
-    console.error('Error connecting to Plug wallet:', error);
-  }
-};
+const authStore = useAuthStore()
 
 const createAccount = async () => {
   try {
-    
-
-
-    // Use the collected input values
     const accountData = {
-      id: principal,
       name: name.value,
       email: email.value,
       phone: phoneNumber.value,
       address: address.value,
     };
-    
-    // Implement account creation logic here
-    console.log('Account data:', accountData);
-    
-    // Example: Call to a backend API or smart contract
-    await user.create_user(principal,name.value,email.value,phoneNumber.value,address.value);
 
-    // create session here
-    //  console.log(user)
+    await authStore.createUser(accountData)
+    toast.add({ ...authStore.status })
 
   } catch (error) {
     console.log(error)

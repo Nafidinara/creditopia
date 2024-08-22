@@ -16,11 +16,12 @@ import MyAccountView from './pages/MyAccountView.vue'
 import CreateLoanView from './pages/CreateLoanView.vue'
 import StackingView from './pages/StackingView.vue';
 import EcosystemView from './pages/Ecosystem.vue';
+import { useAuthStore } from './stores/auth';
 
 const routes = [
-  { path: '', component: HomeView, meta: { auth: true } },
+  { path: '', component: HomeView, meta: { auth: true, } },
   { path: '/signup', component: SignupView, meta: { auth: false } },
-  { path: '/loans', component: LoanView, meta: { auth: true } },
+  { path: '/loans', component: LoanView, meta: { auth: true, } },
   { path: '/loans/create', component: CreateLoanView, meta: { auth: true } },
   { path: '/loans/:id', component: DetailLoanView, meta: { auth: true } },
   { path: '/my-account', component: MyAccountView, meta: { auth: true } },
@@ -51,3 +52,17 @@ createApp(App)
   .use(router)
   .use(createPinia())
   .mount('#app');
+
+const authStore = useAuthStore()
+
+router.beforeEach(async (to, from) => {
+  await authStore.getUser()
+  if (!authStore.isAuth && to.path !== '/' && to.path !== '/signup') {
+    return { path: '/' }
+  }
+  if(authStore.isAuth && to.path === '/signup') {
+    return { path: '/' }
+  }
+})
+
+
