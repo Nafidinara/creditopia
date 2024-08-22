@@ -81,6 +81,7 @@
                   </div>
                   <input type="file" name="file_upload" class="hidden" ref="file">
                 </label>
+                
               </div>
             </div>
             <Button label="Next" fluid class="mt-[40px]" severity="contrast" />
@@ -102,6 +103,27 @@
                   </div>
                   <input type="file" name="file_upload" class="hidden" ref="file">
                 </label>
+                <img
+                  id="image"
+                  ref="imageRef"
+                  :src="imageSrc"
+                  :class="{ invisible: !state.isImageVisible }"
+                  alt="Placeholder"
+                />
+                <video
+                  id="video"
+                  ref="videoRef"
+                  :class="{ invisible: !state.isVideoVisible }"
+                  playsinline
+                ></video>
+                <canvas
+                  id="canvas"
+                  ref="canvasRef"
+                  :class="{ invisible: !state.isCanvasVisible }"
+                ></canvas>
+                <Button @click="store" label="Take Photo" fluid class="mt-[40px]" severity="contrast" />
+                <Button @click="restart" label="Retake Photo" fluid class="mt-[40px]" severity="contrast" />
+
               </div>
             </div>
             <div class="col-span-6">
@@ -115,13 +137,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import Textarea from 'primevue/textarea';
 import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
 import { useRouter } from 'vue-router';
+import { user } from 'declarations/user/index';
 
 const router = useRouter();
 
@@ -134,7 +157,247 @@ const categories = ref([
 ]);
 
 const activeTabs = ref(0)
+const state = reactive({
+      message: '',
+      isVideoVisible: false,
+      isImageVisible: true,
+      isCanvasVisible: false,
+      isButtonsVisible: false,
+      isLoaderVisible: false,
+      isRestartVisible: false,
+      blob: null,
+      isAuthenticated: false,
+      userPrincipal: null,
+      canisterResponse: '',
+      name: ''
+    });
+const videoRef = ref(null);
+    const imageRef = ref(null);
+    const canvasRef = ref(null);
+    onMounted(() => {
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: false })
+        .then((stream) => {
+          const video = videoRef.value;
+          video.srcObject = stream;
+          video.play();
+          state.isButtonsVisible = true;
+          state.isVideoVisible = true;
+          state.isImageVisible = false;
+        })
+        .catch((err) => {
+          state.isImageVisible = true;
+          state.isButtonsVisible = false;
+          console.error(`An error occurred: ${err}`);
+          state.message = "Couldn't start camera, but you can upload photos.";
+        });
+    });
 
+    const captureImage = async () => {
+      const [image, width, height] = selectVisibleElement();
+      const canvas = canvasRef.value;
+      const context = canvas.getContext('2d');
+
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(image, 0, 0, width, height);
+
+      const resizedCanvas = document.createElement('canvas');
+      resizedCanvas.width = 320;
+      resizedCanvas.height = 240;
+      const scale = Math.min(
+        resizedCanvas.width / canvas.width,
+        resizedCanvas.height / canvas.height
+      );
+      const scaledWidth = canvas.width * scale;
+      const scaledHeight = canvas.height * scale;
+      const x = resizedCanvas.width / 2 - scaledWidth / 2;
+      const y = resizedCanvas.height / 2 - scaledHeight / 2;
+
+      const ctx = resizedCanvas.getContext('2d');
+      ctx.drawImage(canvas, x, y, scaledWidth, scaledHeight);
+
+      const blob = await serialize(resizedCanvas);
+
+      if (videoRef.value.srcObject) {
+        videoRef.value.srcObject.getTracks().forEach((track) => track.stop());
+      }
+
+      state.isVideoVisible = false;
+      state.isImageVisible = false;
+      state.isCanvasVisible = true;
+
+      return [blob, { scale, x, y }];
+    };
+
+    const selectVisibleElement = () => {
+      const video = videoRef.value;
+      const image = imageRef.value;
+      const canvas = canvasRef.value;
+      if (!video.classList.contains('invisible')) {
+        return [video, video.videoWidth, video.videoHeight];
+      } else if (!image.classList.contains('invisible')) {
+        return [image, image.width, image.height];
+      } else {
+        return [canvas, canvas.width, canvas.height];
+      }
+    };
+
+    const recognize = async (event) => {
+      event.preventDefault();
+      state.isButtonsVisible = false;
+      state.isLoaderVisible = true;
+      state.message = 'Detecting face..';
+
+      try {
+        const [blob, scaling] = await captureImage();
+        let result = await user.detect(new Uint8Array(blob));
+
+        if (!result.Ok) throw new Error(result.Err.message);
+
+        const face = await render(scaling, result.Ok);
+        state.message = 'Face detected. Recognizing..';
+
+        result = await user.recognize(new Uint8Array(face));
+        if (!result.Ok) throw new Error(result.Err.message);
+
+        const label = sanitize(result.Ok.label);
+        const score = Math.round(result.Ok.score * 100) / 100;
+        state.message = `${label}, difference=${score}`;
+      } catch (err) {
+        console.error(`An error occurred: ${err}`);
+        state.message = err.toString();
+      }
+
+      state.isLoaderVisible = false;
+      state.isRestartVisible = true;
+    };
+
+    const store = async (event) => {
+      event.preventDefault();
+      state.isButtonsVisible = false;
+      state.isLoaderVisible = true;
+      state.message = 'Detecting face..';
+
+      try {
+        const [blob, scaling] = await captureImage();
+        let result = await user.detect(new Uint8Array(blob));
+        console.log(result,"result")
+        if (!result.Ok) throw new Error(result.Err.message);
+
+        const face = await render(scaling, result.Ok);
+        const label = prompt('Enter name of the person');
+        console.log(face,"Face")
+        if (!label) throw new Error('Cannot add without a name');
+
+        const sanitizedLabel = sanitize(label);
+        state.message = `Face detected. Adding ${sanitizedLabel}..`;
+
+        result = await user.add(sanitizedLabel, new Uint8Array(face));
+        if (!result.Ok) throw new Error(result.Err.message);
+
+        state.message = `Successfully added ${sanitizedLabel}.`;
+      } catch (err) {
+        console.error(`An error occurred: ${err}`);
+        state.message = `Failed to add the face: ${err.toString()}`;
+      }
+
+      state.isLoaderVisible = false;
+      state.isRestartVisible = true;
+    };
+
+    const loadLocalImage = async (event) => {
+      state.message = '';
+      const image = imageRef.value;
+      try {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const url = await toDataURL(file);
+        image.src = url;
+      } catch (err) {
+        state.message = `Failed to select photo: ${err.toString()}`;
+      }
+
+      state.isVideoVisible = false;
+      state.isCanvasVisible = false;
+      state.isImageVisible = true;
+      state.isButtonsVisible = true;
+    };
+
+    const toDataURL = (blob) => {
+      return new Promise((resolve) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(blob);
+        fileReader.onloadend = () => resolve(fileReader.result);
+      });
+    };
+
+    const restart = (event) => {
+      state.isRestartVisible = false;
+      state.message = '';
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: false })
+        .then((stream) => {
+          const video = videoRef.value;
+          video.srcObject = stream;
+          video.play();
+          state.isButtonsVisible = true;
+          state.isVideoVisible = true;
+        });
+    };
+
+    const render = async (scaling, box) => {
+      box.left = Math.round((box.left * 320 - scaling.x) / scaling.scale);
+      box.right = Math.round((box.right * 320 - scaling.x) / scaling.scale);
+      box.top = Math.round((box.top * 240 - scaling.y) / scaling.scale);
+      box.bottom = Math.round((box.bottom * 240 - scaling.y) / scaling.scale);
+
+      const ctx = canvasRef.value.getContext('2d');
+      ctx.beginPath();
+      ctx.lineWidth = '4';
+      ctx.strokeStyle = 'red';
+      ctx.rect(box.left, box.top, box.right - box.left, box.bottom - box.top);
+      ctx.stroke();
+
+      const width = box.right - box.left;
+      const height = box.bottom - box.top;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 160;
+      canvas.height = 160;
+
+      const ctx2 = canvas.getContext('2d');
+      ctx2.drawImage(
+        ctx.canvas,
+        box.left,
+        box.top,
+        width,
+        height,
+        0,
+        0,
+        160,
+        160
+      );
+
+      return serialize(canvas);
+    };
+
+    const serialize = (canvas) => {
+      return new Promise((resolve) => {
+        canvas.toBlob(
+          (blob) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsArrayBuffer(blob);
+          },
+          'image/png',
+          0.95
+        );
+      });
+    };
+
+    const sanitize = (label) => label.trim();
 </script>
 
 <style>
