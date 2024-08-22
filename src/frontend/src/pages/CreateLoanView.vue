@@ -24,32 +24,32 @@
             <div class="col-span-6">
               <div class="flex flex-col gap-2 mt-5">
                 <label for="name" class="text-sm text-[#AAA]">Name</label>
-                <InputText id="name" placeholder="Enter your business name" />
+                <InputText v-model="name" id="name" placeholder="Enter your business name" />
               </div>
             </div>
             <div class="col-span-6">
               <div class="flex flex-col gap-2 mt-5">
                 <label for="category" class="text-sm text-[#AAA]">Select Category</label>
-                <Select id="category" placeholder="--" :options="categories" optionLabel="name" />
+                <Select v-model="category" id="category" placeholder="--" :options="categories" optionLabel="name" />
               </div>
             </div>
           </div>
           <div class="flex flex-col gap-2 mt-5 pb-4 border-b border-gray-600">
             <label for="description" class="text-sm text-[#AAA]">Description</label>
-            <Textarea id="description" placeholder="Write description of your business" />
+            <Textarea v-model="description" id="description" placeholder="Write description of your business" />
           </div>
           <div class="mt-5">
             <div class="grid grid-cols-12 gap-5">
               <div class="col-span-6">
                 <div class="flex flex-col gap-2 mt-5">
                   <label for="start_curation" class="text-sm text-[#AAA]">Start Duration</label>
-                  <DatePicker showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
+                  <DatePicker v-model="startDuration" showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
                 </div>
               </div>
               <div class="col-span-6">
                 <div class="flex flex-col gap-2 mt-5">
                   <label for="end_duration" class="text-sm text-[#AAA]">End Duration</label>
-                  <DatePicker showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
+                  <DatePicker v-model="endDuration" showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
                 </div>
               </div>
             </div>
@@ -57,14 +57,20 @@
               <div class="col-span-6">
                 <div class="flex flex-col gap-2 mt-5">
                   <label for="commit" class="text-sm text-[#AAA]">When you commit to repay?</label>
-                  <DatePicker showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
+                  <DatePicker v-model="commit" showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
                 </div>
               </div>
               <div class="col-span-6">
                 <div class="flex flex-col gap-2 mt-5">
                   <label for="interest" class="text-sm text-[#AAA]">Interest</label>
-                  <Select id="interest" placeholder="--" :options="categories" optionLabel="name" />
+                  <Select v-model="interest" id="interest" placeholder="--" :options="listInterest" optionLabel="name" />
                 </div>
+                <div class="col-span-12">
+              <div class="flex flex-col gap-2 mt-5">
+                <label for="name" class="text-sm text-[#AAA]">Total ICP</label>
+                <InputText v-model="amount" id="name" placeholder="Enter your business name" />
+              </div>
+            </div>
               </div>
             </div>
             <div class="mt-5">
@@ -129,7 +135,7 @@
             <div class="col-span-6">
             </div>
           </div>
-          <Button label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
+          <Button @click="create"  label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
         </div>
       </div>
     </div>
@@ -145,8 +151,18 @@ import DatePicker from 'primevue/datepicker';
 import Button from 'primevue/button';
 import { useRouter } from 'vue-router';
 import { user } from 'declarations/user/index';
+import { loan } from 'declarations/loan/index';
 
 const router = useRouter();
+
+const name = ref('');
+const description = ref('');
+const interest = ref(null);
+const startDuration = ref(null);
+const endDuration = ref(null);
+const category = ref(null);
+const amount = ref(0);
+const commit = ref(null);
 
 const categories = ref([
   { name: 'F&B', code: 'F&B' },
@@ -158,6 +174,11 @@ const categories = ref([
   { name: 'Others', code: 'Others' }
 ]);
 
+const listInterest = ref([
+  { name: '5%', code: '5' },
+  { name: '10%', code: '10' },
+  { name: '15%', code: '15' },
+])
 const activeTabs = ref(0)
 const state = reactive({
       message: '',
@@ -400,6 +421,31 @@ const videoRef = ref(null);
     };
 
     const sanitize = (label) => label.trim();
+
+    const create = async () => {
+        const start = new Date();
+        const end = new Date(commit.value);
+
+        // Calculate the difference in time
+        const tenor = Math.abs(end - start);
+
+        // Convert the time difference from milliseconds to days
+        const diffDays = Math.ceil(tenor / (1000 * 60 * 60 * 24));
+
+        const startWaiting = new Date(startDuration.value);
+        const endWaiting = new Date(endDuration.value);
+        
+        // Calculate the difference in time
+        const waitingTime = Math.abs(endWaiting - startWaiting);
+
+        // Convert the time difference from milliseconds to days
+        const diffDaysWait = Math.ceil(waitingTime / (1000 * 60 * 60 * 24));
+        console.log(diffDaysWait)
+        console.log(name.value,description.value,category.value.code,parseFloat(amount.value),diffDays,diffDaysWait,parseFloat(interest.value.code))
+        loan.registerLoan(name.value,description.value,category.value.code,parseFloat(amount.value),diffDays,diffDaysWait,parseFloat(interest.value.code)).then((res) => {
+          console.log(res)
+        })
+    }
 </script>
 
 <style>
