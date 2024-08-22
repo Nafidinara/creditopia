@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "@dfinity/auth-client": "^2.0.0",
-    "@psychedelic/plug-connect": "^0.2.0",
+    "@dfinity/agent": "^2.0.0",
     "azle": "^0.19.0"
   }
 }
