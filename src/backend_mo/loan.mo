@@ -76,7 +76,7 @@ actor class P2PLendingComplex() = this {
     let DAY_IN_NANOSECONDS : Int = 86_400_000_000_000;
 
     // ===== LOAN FUNCTIONS =====
-    public shared (msg) func registerLoan(title : Text, description : Text, category : Text, amount : Nat64, tenor : Nat, waitTime : Nat, interestRate : Float) : async Result.Result<LoanId, Error> {
+    public shared func registerLoan(caller : Principal, title : Text, description : Text, category : Text, amount : Nat64, tenor : Nat, waitTime : Nat, interestRate : Float) : async Result.Result<LoanId, Error> {
         let id = nextLoanId;
         nextLoanId += 1;
 
@@ -92,7 +92,7 @@ actor class P2PLendingComplex() = this {
                     title = title;
                     description = description;
                     category = category;
-                    borrower = msg.caller;
+                    borrower = caller;
                     lenders = [];
                     totalAmount = amount;
                     fundedAmount = 0;
@@ -106,31 +106,31 @@ actor class P2PLendingComplex() = this {
                 };
 
                 loans.put(id, loan);
-                #ok(id);
+                return #ok(id);
             };
         };
     };
 
-    public shared (msg) func lendToLoan(loan_id : LoanId, amount : Nat64) : async Result.Result<(), Error> {
+    public shared func lendToLoan(caller : Principal, loan_id : LoanId, amount : Nat64) : async Result.Result<(), Error> {
         switch (loans.get(loan_id)) {
-            case null #err(#NotFound);
+            case null { return #err(#NotFound) };
             case (?loan) {
                 if (loan.status != #Pending) {
                     return #err(#InvalidStatus);
                 };
 
-                switch (balances.get(msg.caller)) {
-                    case null return #err(#InsufficientFunds);
+                switch (balances.get(caller)) {
+                    case null { return #err(#InsufficientFunds) };
                     case (?balance) {
                         if (Nat64.fromNat(balance) < amount) {
                             return #err(#InsufficientFunds);
                         };
 
                         let new_balance = balance - Nat64.toNat(amount);
-                        balances.put(msg.caller, new_balance);
+                        balances.put(caller, new_balance);
 
                         let new_funded_amount = loan.fundedAmount + amount;
-                        let new_lenders = Array.append(loan.lenders, [{ lender = msg.caller; amount = amount }]);
+                        let new_lenders = Array.append(loan.lenders, [{ lender = caller; amount = amount }]);
 
                         let updatedStatus = if (new_funded_amount >= loan.totalAmount and Time.now() >= loan.createdAt + Int64.toInt(Int64.fromNat64(Nat64.fromNat(loan.waitTime))) * DAY_IN_NANOSECONDS) {
                             #ReadyToClaim;
@@ -144,18 +144,18 @@ actor class P2PLendingComplex() = this {
                         };
 
                         loans.put(loan_id, updated_loan);
-                        #ok();
+                        return #ok();
                     };
                 };
             };
         };
     };
 
-    public shared (msg) func claimLoan(loanId : LoanId) : async Result.Result<(), Error> {
+    public shared func claimLoan(caller : Principal, loanId : LoanId) : async Result.Result<(), Error> {
         switch (loans.get(loanId)) {
-            case null { #err(#NotFound) };
+            case null { return #err(#NotFound) };
             case (?loan) {
-                if (loan.borrower != msg.caller) {
+                if (loan.borrower != caller) {
                     return #err(#NotAuthorized);
                 };
                 if (loan.status != #ReadyToClaim) {
@@ -170,7 +170,7 @@ actor class P2PLendingComplex() = this {
                 };
 
                 // Transfer ICP from contract to borrower
-                let withdraw_account = Account.accountIdentifier(msg.caller, Account.defaultSubaccount());
+                let withdraw_account = Account.accountIdentifier(caller, Account.defaultSubaccount());
                 let icp_receipt = await Ledger.transfer({
                     memo = 0;
                     from_subaccount = ?Account.defaultSubaccount();
@@ -192,18 +192,18 @@ actor class P2PLendingComplex() = this {
                             status = #Claimed;
                         };
                         loans.put(loanId, updatedLoan);
-                        #ok();
+                        return #ok();
                     };
                 };
             };
         };
     };
 
-    public shared (msg) func cancelLoanAsBorrower(loanId : LoanId) : async Result.Result<(), Error> {
+    public shared func cancelLoanAsBorrower(caller : Principal, loanId : LoanId) : async Result.Result<(), Error> {
         switch (loans.get(loanId)) {
-            case null { #err(#NotFound) };
+            case null { return #err(#NotFound) };
             case (?loan) {
-                if (loan.borrower != msg.caller) {
+                if (loan.borrower != caller) {
                     return #err(#NotAuthorized);
                 };
                 if (loan.status != #Pending and loan.status != #ReadyToClaim) {
@@ -228,14 +228,14 @@ actor class P2PLendingComplex() = this {
                     status = #Cancelled;
                 };
                 loans.put(loanId, updatedLoan);
-                #ok();
+                return #ok();
             };
         };
     };
 
-    public shared (msg) func reclaimFundsAsLender(loanId : LoanId) : async Result.Result<(), Error> {
+    public shared func reclaimFundsAsLender(caller : Principal, loanId : LoanId) : async Result.Result<(), Error> {
         switch (loans.get(loanId)) {
-            case null { #err(#NotFound) };
+            case null { return #err(#NotFound) };
             case (?loan) {
                 if (loan.status != #ReadyToClaim) {
                     return #err(#InvalidStatus);
@@ -246,241 +246,32 @@ actor class P2PLendingComplex() = this {
                 };
 
                 // Find the lender's contribution
-                let lenderInfoOpt = Array.find(loan.lenders, func(info : LenderInfo) : Bool { info.lender == msg.caller });
+                let lenderInfoOpt = Array.find(loan.lenders, func(info : LenderInfo) : Bool { info.lender == caller });
 
                 switch (lenderInfoOpt) {
                     case null { return #err(#NotAuthorized) };
                     case (?lenderInfo) {
                         // Return funds to lender's balance
-                        let current_balance = switch (balances.get(msg.caller)) {
+                        let current_balance = switch (balances.get(caller)) {
                             case null 0;
                             case (?balance) balance;
                         };
-                        balances.put(msg.caller, current_balance + Nat64.toNat(lenderInfo.amount));
+                        balances.put(caller, current_balance + Nat64.toNat(lenderInfo.amount));
 
                         // Remove this lender from the loan
-                        let updatedLenders = Array.filter(loan.lenders, func(info : LenderInfo) : Bool { info.lender != msg.caller });
-                        let updatedFundedAmount = loan.fundedAmount - lenderInfo.amount;
-                        let updatedStatus = if (Array.size(updatedLenders) == 0) {
-                            #Cancelled;
-                        } else { #ReadyToClaim };
-
+                        let updated_lenders = Array.filter(loan.lenders, func(info : LenderInfo) : Bool { info.lender != caller });
                         let updatedLoan = {
                             loan with
-                            lenders = updatedLenders;
-                            fundedAmount = updatedFundedAmount;
-                            status = updatedStatus;
+                            lenders = updated_lenders;
                         };
+
                         loans.put(loanId, updatedLoan);
-                        #ok();
+                        return #ok();
                     };
                 };
             };
         };
     };
 
-    public shared (msg) func repayLoan(loanId : LoanId) : async Result.Result<(), Error> {
-        switch (loans.get(loanId)) {
-            case null { #err(#NotFound) };
-            case (?loan) {
-                if (loan.borrower != msg.caller) {
-                    return #err(#NotAuthorized);
-                };
-                if (loan.status != #Claimed) {
-                    return #err(#InvalidStatus);
-                };
-
-                // Calculate total repayment amount (principal + interest)
-                let principal = Float.fromInt64(Int64.fromNat64(loan.fundedAmount));
-                let interestAmount = principal * loan.interestRate * (Float.fromInt(loan.tenor) / 365.0);
-                let totalRepayment = principal + interestAmount;
-                let repaymentAmount = Nat64.fromNat(Int.abs(Float.toInt(totalRepayment)));
-
-                // Check if borrower has sufficient balance
-                switch (balances.get(msg.caller)) {
-                    case null return #err(#InsufficientFunds);
-                    case (?balance) {
-                        if (Nat64.fromNat(balance) < repaymentAmount) {
-                            return #err(#InsufficientFunds);
-                        };
-
-                        // Deduct repayment from borrower's balance
-                        let new_balance = balance - Nat64.toNat(repaymentAmount);
-                        balances.put(msg.caller, new_balance);
-
-                        // Distribute repayment to lenders
-                        for (lenderInfo in loan.lenders.vals()) {
-                            let lenderRepayment = (Float.fromInt64(Int64.fromNat64(lenderInfo.amount)) / principal) * Float.fromInt64(Int64.fromNat64(repaymentAmount));
-                            let lenderRepaymentAmount = Nat64.fromNat(Int.abs(Float.toInt(lenderRepayment)));
-                            let current_lender_balance = switch (balances.get(lenderInfo.lender)) {
-                                case null 0;
-                                case (?balance) balance;
-                            };
-                            balances.put(lenderInfo.lender, current_lender_balance + Nat64.toNat(lenderRepaymentAmount));
-                        };
-
-                        let updatedLoan = {
-                            loan with
-                            status = #Repaid;
-                        };
-                        loans.put(loanId, updatedLoan);
-                        #ok();
-                    };
-                };
-            };
-        };
-    };
-
-    // ===== DEPOSIT FUNCTIONS =====
-    public shared (msg) func getDepositAddress() : async Blob {
-        Account.accountIdentifier(Principal.fromActor(this), Account.principalToSubaccount(msg.caller));
-    };
-
-    public shared (msg) func deposit() : async Result.Result<Nat, Error> {
-        let source_account = Account.accountIdentifier(Principal.fromActor(this), Account.principalToSubaccount(msg.caller));
-        let balance = await Ledger.account_balance({ account = source_account });
-
-        Debug.print(
-            "Balance "
-            # debug_show (balance)
-            # "account "
-            # debug_show (source_account)
-        );
-
-        if (Nat64.toNat(balance.e8s) <= icp_fee) {
-            return #err(#InsufficientFunds);
-        };
-
-        let transfer_amount = Nat64.toNat(balance.e8s) - icp_fee;
-
-        let icp_receipt = await Ledger.transfer({
-            memo : Nat64 = 0;
-            from_subaccount = ?Account.principalToSubaccount(msg.caller);
-            to = Account.accountIdentifier(Principal.fromActor(this), Account.defaultSubaccount());
-            amount = { e8s = Nat64.fromNat(transfer_amount) };
-            fee = { e8s = Nat64.fromNat(icp_fee) };
-            created_at_time = ?{
-                timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
-            };
-        });
-
-        switch icp_receipt {
-            case (#Err _) {
-                return #err(#TransferFailed);
-            };
-            case _ {};
-        };
-
-        let current_balance = switch (balances.get(msg.caller)) {
-            case null 0;
-            case (?balance) balance;
-        };
-        balances.put(msg.caller, current_balance + transfer_amount);
-
-        #ok(transfer_amount);
-    };
-
-    // ===== WITHDRAW FUNCTIONS =====
-    public shared (msg) func withdraw(amount : Nat) : async Result.Result<Nat, Error> {
-        switch (balances.get(msg.caller)) {
-            case null return #err(#InsufficientFunds);
-            case (?balance) {
-                if (balance < amount) {
-                    return #err(#InsufficientFunds);
-                };
-
-                // Perform transfer
-                let withdraw_account = Account.accountIdentifier(msg.caller, Account.defaultSubaccount());
-                let icp_receipt = await Ledger.transfer({
-                    memo = 0;
-                    from_subaccount = ?Account.defaultSubaccount();
-                    to = withdraw_account;
-                    amount = { e8s = Nat64.fromNat(amount) };
-                    fee = { e8s = Nat64.fromNat(icp_fee) };
-                    created_at_time = ?{
-                        timestamp_nanos = Nat64.fromNat(Int.abs(Time.now()));
-                    };
-                });
-
-                switch icp_receipt {
-                    case (#Err _) {
-                        return #err(#TransferFailed);
-                    };
-                    case _ {};
-                };
-
-                // Update user's balance
-                let new_balance = balance - amount;
-                balances.put(msg.caller, new_balance);
-
-                #ok(amount);
-            };
-        };
-    };
-
-    // ===== QUERY FUNCTIONS =====
-    public query func getLoan(loanId : LoanId) : async Result.Result<Loan, Error> {
-        switch (loans.get(loanId)) {
-            case null { #err(#NotFound) };
-            case (?loan) { #ok(loan) };
-        };
-    };
-
-    public query func getBalance(user : Principal) : async Nat {
-        switch (balances.get(user)) {
-            case null 0;
-            case (?balance) balance;
-        };
-    };
-
-    public query func getAllLoans() : async [(LoanId, Loan)] {
-        Iter.toArray(loans.entries());
-    };
-
-    public query func getLoansByBorrower(borrower : Principal) : async [Loan] {
-        Iter.toArray(
-            Iter.filter(
-                loans.vals(),
-                func(loan : Loan) : Bool {
-                    loan.borrower == borrower;
-                },
-            )
-        );
-    };
-
-    // 2. Get all loans funded by the lender
-    public query func getLoansByLender(lender : Principal) : async [Loan] {
-        Iter.toArray(
-            Iter.filter(
-                loans.vals(),
-                func(loan : Loan) : Bool {
-                    Array.find(loan.lenders, func(info : LenderInfo) : Bool { info.lender == lender }) != null;
-                },
-            )
-        );
-    };
-
-    // 3. Get the total amount of ICP the lender has given
-    public query func getTotalLentAmount(lender : Principal) : async Nat64 {
-        var total : Nat64 = 0;
-        for (loan in loans.vals()) {
-            for (lenderInfo in loan.lenders.vals()) {
-                if (lenderInfo.lender == lender) {
-                    total += lenderInfo.amount;
-                };
-            };
-        };
-        total;
-    };
-
-    // ===== SYSTEM FUNCTIONS =====
-    // system func preupgrade() {
-    //     balances_stable := Iter.toArray(balances.entries());
-    // };
-
-    // system func postupgrade() {
-    //     balances := HashMap.fromIter<Principal, Nat>(balances_stable.vals(), 10, Principal.equal, Principal.hash);
-    //     balances_stable := [];
-    // };
-
+    // Other functions like querying loans, updating loan statuses, etc. can be added here
 };
