@@ -149,11 +149,13 @@ import { user } from 'declarations/user/index';
 const router = useRouter();
 
 const categories = ref([
-  { name: 'New York', code: 'NY' },
-  { name: 'Rome', code: 'RM' },
-  { name: 'London', code: 'LDN' },
-  { name: 'Istanbul', code: 'IST' },
-  { name: 'Paris', code: 'PRS' }
+  { name: 'F&B', code: 'F&B' },
+  { name: 'Fashion', code: 'Fashion' },
+  { name: 'Culinary', code: 'Culinary' },
+  { name: 'Healthcare', code: 'Healthcare' },
+  { name: 'Event', code: 'Event' },
+  { name: 'UMKM', code: 'UMKM' },
+  { name: 'Others', code: 'Others' }
 ]);
 
 const activeTabs = ref(0)

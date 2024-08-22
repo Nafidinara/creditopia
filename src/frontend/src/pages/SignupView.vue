@@ -37,6 +37,7 @@ import { ref } from 'vue';
 import Toast from 'primevue/toast';
 import { useAuthStore } from '../stores/auth';
 import { useToast } from 'primevue/usetoast';
+import { useRouter } from 'vue-router';
 
 const name = ref('');
 const email = ref('');
@@ -44,6 +45,7 @@ const phoneNumber = ref('');
 const address = ref('');
 
 const toast = useToast()
+const router = useRouter()
 
 const authStore = useAuthStore()
 
@@ -58,6 +60,7 @@ const createAccount = async () => {
 
     await authStore.createUser(accountData)
     toast.add({ ...authStore.status })
+    router.push('/')
 
   } catch (error) {
     console.log(error)

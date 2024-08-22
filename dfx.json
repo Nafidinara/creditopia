@@ -9,15 +9,6 @@
         "bash build.sh"
       ]
     },
-    "CDTP": {
-      "type": "custom",
-      "candid": "src/icrc_ledger/icrc_ledger.did",
-      "wasm": "src/icrc_ledger/icrc_ledger.wasm"
-    },
-    "staking":{
-      "type":"motoko",
-      "main":"src/staking/staking.mo"
-    },
     "frontend": {
       "dependencies": [
         "user"

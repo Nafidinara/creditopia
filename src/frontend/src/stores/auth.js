@@ -1,4 +1,3 @@
-// stores/counter.js
 import { defineStore } from 'pinia'
 import { user } from 'declarations/user/index';
 
