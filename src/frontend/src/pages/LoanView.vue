@@ -64,9 +64,27 @@ const data = ref([
     creator: 'Bebe Bonica',
     category: 'Event',
     totalSupplied: '400 ICP',
-    interest: '12% - 15%',
+    interest: '15%',
     returnTime: '08/14/2024'
-  }
+  },
+  {
+    id: 2,
+    name: 'Tax',
+    creator: 'Iwan Fals',
+    category: 'Event',
+    totalSupplied: '400 ICP',
+    interest: '15%',
+    returnTime: '08/14/2024'
+  },
+  {
+    id: 3,
+    name: 'Cash Advance',
+    creator: 'John F Kennedy',
+    category: 'Event',
+    totalSupplied: '400 ICP',
+    interest: '15%',
+    returnTime: '08/14/2024'
+  },
 ]);
 
 </script>

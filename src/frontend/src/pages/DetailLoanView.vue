@@ -33,7 +33,7 @@
             </div>
             <div class="col-span-4">
               <p class="text-xs text-[#BDD4FF]">Interest</p>
-              <p class="text-2xl mt-2">12-15%</p>
+              <p class="text-2xl mt-2">15%</p>
             </div>
             <div class="col-span-4 text-right">
               <p class="text-sm">282,173 CP <span class="text-[#aaa]">| 564,356 ICP</span></p>
