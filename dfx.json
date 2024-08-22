@@ -10,8 +10,11 @@
     "CDTP": {
       "type": "custom",
       "candid": "src/icrc_ledger/icrc_ledger.did",
-      "wasm": "src/icrc_ledger/icrc_ledger.wasm",
-      "specified_id": "mxzaz-hqaaa-aaaar-qaada-cai"
+      "wasm": "src/icrc_ledger/icrc_ledger.wasm"
+    },
+    "staking":{
+      "type":"motoko",
+      "main":"src/staking/staking.mo"
     },
     "frontend": {
       "dependencies": [
