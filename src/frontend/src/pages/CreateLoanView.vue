@@ -19,7 +19,7 @@
             Verification
           </div>
         </div>
-        <div v-if="activeTabs === 0">
+        <div v-show="activeTabs === 0">
           <div class="grid grid-cols-12 gap-5 mt-[40px]">
             <div class="col-span-6">
               <div class="flex flex-col gap-2 mt-5">
@@ -41,15 +41,17 @@
           <div class="mt-5">
             <div class="grid grid-cols-12 gap-5">
               <div class="col-span-6">
-                <div class="flex flex-col gap-2 mt-5">
+                <div class="flex flex-col gap-2">
                   <label for="start_curation" class="text-sm text-[#AAA]">Start Duration</label>
-                  <DatePicker v-model="startDuration" showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
+                  <DatePicker v-model="startDuration" showIcon fluid :showOnFocus="false" :manualInput="false"
+                    placeholder="MM/DD/YYYY" />
                 </div>
               </div>
               <div class="col-span-6">
-                <div class="flex flex-col gap-2 mt-5">
+                <div class="flex flex-col gap-2">
                   <label for="end_duration" class="text-sm text-[#AAA]">End Duration</label>
-                  <DatePicker v-model="endDuration" showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
+                  <DatePicker v-model="endDuration" showIcon fluid :showOnFocus="false" :manualInput="false"
+                    placeholder="MM/DD/YYYY" />
                 </div>
               </div>
             </div>
@@ -57,20 +59,22 @@
               <div class="col-span-6">
                 <div class="flex flex-col gap-2 mt-5">
                   <label for="commit" class="text-sm text-[#AAA]">When you commit to repay?</label>
-                  <DatePicker v-model="commit" showIcon fluid :showOnFocus="false" :manualInput="false" placeholder="MM/DD/YYYY" />
+                  <DatePicker v-model="commit" showIcon fluid :showOnFocus="false" :manualInput="false"
+                    placeholder="MM/DD/YYYY" />
                 </div>
               </div>
               <div class="col-span-6">
                 <div class="flex flex-col gap-2 mt-5">
                   <label for="interest" class="text-sm text-[#AAA]">Interest</label>
-                  <Select v-model="interest" id="interest" placeholder="--" :options="listInterest" optionLabel="name" />
+                  <Select v-model="interest" id="interest" placeholder="--" :options="listInterest"
+                    optionLabel="name" />
                 </div>
                 <div class="col-span-12">
-              <div class="flex flex-col gap-2 mt-5">
-                <label for="name" class="text-sm text-[#AAA]">Total ICP</label>
-                <InputText v-model="amount" id="name" placeholder="Enter your business name" />
-              </div>
-            </div>
+                  <div class="flex flex-col gap-2 mt-5">
+                    <label for="name" class="text-sm text-[#AAA]">Total ICP</label>
+                    <InputText v-model="amount" id="name" placeholder="Enter your business name" />
+                  </div>
+                </div>
               </div>
             </div>
             <div class="mt-5">
@@ -87,14 +91,14 @@
                   </div>
                   <input type="file" name="file_upload" class="hidden" ref="file">
                 </label>
-                
+
               </div>
             </div>
             <Button label="Next" fluid class="mt-[40px]" severity="contrast" />
           </div>
         </div>
-        <div v-else>
-          <div class="mt-[40px] grid grid-cols-12">
+        <div v-show="activeTabs === 1">
+          <div class="mt-[40px] grid grid-cols-12 gap-4">
             <div class="col-span-6">
               <label for="face" class="text-sm text-[#AAA]">Upload your Face Photo</label>
               <div class="w-full mt-2">
@@ -109,33 +113,22 @@
                   </div>
                   <input type="file" name="file_upload" class="hidden" ref="file">
                 </label>
-                <img
-                  id="image"
-                  ref="imageRef"
-                  :src="imageSrc"
-                  :class="{ invisible: !state.isImageVisible }"
-                  alt="Placeholder"
-                />
-                <video
-                  id="video"
-                  ref="videoRef"
-                  :class="{ invisible: !state.isVideoVisible }"
-                  playsinline
-                ></video>
-                <canvas
-                  id="canvas"
-                  ref="canvasRef"
-                  :class="{ invisible: !state.isCanvasVisible }"
-                ></canvas>
-                <Button @click="store" label="Take Photo" fluid class="mt-[40px]" severity="contrast" />
-                <Button @click="restart" label="Retake Photo" fluid class="mt-[40px]" severity="contrast" />
-
               </div>
             </div>
             <div class="col-span-6">
+              <label for="face" class="text-sm text-[#AAA]">Take photo of your face</label>
+              <div class="mt-2">
+                <img id="image" ref="imageRef" :src="imageSrc" :class="{ hidden: !state.isImageVisible }"
+                  alt="Placeholder" class="rounded-lg" />
+                <video id="video" ref="videoRef" :class="{ hidden: !state.isVideoVisible }" class="rounded-lg"
+                  playsinline></video>
+                <canvas id="canvas" ref="canvasRef" :class="{ hidden: !state.isCanvasVisible }" class="w-full rounded-lg"></canvas>
+                <Button @click="store" label="Take Photo" fluid class="mt-[40px]" severity="contrast" />
+                <Button @click="restart" label="Retake Photo" fluid class="mt-[40px]" severity="contrast" />
+              </div>
             </div>
           </div>
-          <Button @click="create"  label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
+          <Button @click="create" label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
         </div>
       </div>
     </div>
@@ -181,271 +174,272 @@ const listInterest = ref([
 ])
 const activeTabs = ref(0)
 const state = reactive({
-      message: '',
-      isVideoVisible: false,
-      isImageVisible: true,
-      isCanvasVisible: false,
-      isButtonsVisible: false,
-      isLoaderVisible: false,
-      isRestartVisible: false,
-      blob: null,
-      isAuthenticated: false,
-      userPrincipal: null,
-      canisterResponse: '',
-      name: ''
-    });
+  message: '',
+  isVideoVisible: false,
+  isImageVisible: true,
+  isCanvasVisible: false,
+  isButtonsVisible: false,
+  isLoaderVisible: false,
+  isRestartVisible: false,
+  blob: null,
+  isAuthenticated: false,
+  userPrincipal: null,
+  canisterResponse: '',
+  name: ''
+});
 const videoRef = ref(null);
-    const imageRef = ref(null);
-    const canvasRef = ref(null);
-    onMounted(() => {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: false })
-        .then((stream) => {
-          const video = videoRef.value;
-          video.srcObject = stream;
-          video.play();
-          state.isButtonsVisible = true;
-          state.isVideoVisible = true;
-          state.isImageVisible = false;
-        })
-        .catch((err) => {
-          state.isImageVisible = true;
-          state.isButtonsVisible = false;
-          console.error(`An error occurred: ${err}`);
-          state.message = "Couldn't start camera, but you can upload photos.";
-        });
-    });
-
-    const captureImage = async () => {
-      const [image, width, height] = selectVisibleElement();
-      const canvas = canvasRef.value;
-      const context = canvas.getContext('2d');
-
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(image, 0, 0, width, height);
-
-      const resizedCanvas = document.createElement('canvas');
-      resizedCanvas.width = 320;
-      resizedCanvas.height = 240;
-      const scale = Math.min(
-        resizedCanvas.width / canvas.width,
-        resizedCanvas.height / canvas.height
-      );
-      const scaledWidth = canvas.width * scale;
-      const scaledHeight = canvas.height * scale;
-      const x = resizedCanvas.width / 2 - scaledWidth / 2;
-      const y = resizedCanvas.height / 2 - scaledHeight / 2;
-
-      const ctx = resizedCanvas.getContext('2d');
-      ctx.drawImage(canvas, x, y, scaledWidth, scaledHeight);
-
-      const blob = await serialize(resizedCanvas);
-
-      if (videoRef.value.srcObject) {
-        videoRef.value.srcObject.getTracks().forEach((track) => track.stop());
-      }
-
-      state.isVideoVisible = false;
-      state.isImageVisible = false;
-      state.isCanvasVisible = true;
-
-      return [blob, { scale, x, y }];
-    };
-
-    const selectVisibleElement = () => {
+const imageRef = ref(null);
+const canvasRef = ref(null);
+onMounted(() => {
+  navigator.mediaDevices
+    .getUserMedia({ video: true, audio: false })
+    .then((stream) => {
       const video = videoRef.value;
-      const image = imageRef.value;
-      const canvas = canvasRef.value;
-      if (!video.classList.contains('invisible')) {
-        return [video, video.videoWidth, video.videoHeight];
-      } else if (!image.classList.contains('invisible')) {
-        return [image, image.width, image.height];
-      } else {
-        return [canvas, canvas.width, canvas.height];
-      }
-    };
-
-    const recognize = async (event) => {
-      event.preventDefault();
-      state.isButtonsVisible = false;
-      state.isLoaderVisible = true;
-      state.message = 'Detecting face..';
-
-      try {
-        const [blob, scaling] = await captureImage();
-        let result = await user.detect(new Uint8Array(blob));
-
-        if (!result.Ok) throw new Error(result.Err.message);
-
-        const face = await render(scaling, result.Ok);
-        state.message = 'Face detected. Recognizing..';
-
-        result = await user.recognize(new Uint8Array(face));
-        if (!result.Ok) throw new Error(result.Err.message);
-
-        const label = sanitize(result.Ok.label);
-        const score = Math.round(result.Ok.score * 100) / 100;
-        state.message = `${label}, difference=${score}`;
-      } catch (err) {
-        console.error(`An error occurred: ${err}`);
-        state.message = err.toString();
-      }
-
-      state.isLoaderVisible = false;
-      state.isRestartVisible = true;
-    };
-
-    const store = async (event) => {
-      event.preventDefault();
-      state.isButtonsVisible = false;
-      state.isLoaderVisible = true;
-      state.message = 'Detecting face..';
-
-      try {
-        const [blob, scaling] = await captureImage();
-        let result = await user.detect(new Uint8Array(blob));
-        console.log(result,"result")
-        if (!result.Ok) throw new Error(result.Err.message);
-
-        const face = await render(scaling, result.Ok);
-        const label = prompt('Enter name of the person');
-        console.log(face,"Face")
-        if (!label) throw new Error('Cannot add without a name');
-
-        const sanitizedLabel = sanitize(label);
-        state.message = `Face detected. Adding ${sanitizedLabel}..`;
-
-        result = await user.add(sanitizedLabel, new Uint8Array(face));
-        if (!result.Ok) throw new Error(result.Err.message);
-
-        state.message = `Successfully added ${sanitizedLabel}.`;
-      } catch (err) {
-        console.error(`An error occurred: ${err}`);
-        state.message = `Failed to add the face: ${err.toString()}`;
-      }
-
-      state.isLoaderVisible = false;
-      state.isRestartVisible = true;
-    };
-
-    const loadLocalImage = async (event) => {
-      state.message = '';
-      const image = imageRef.value;
-      try {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const url = await toDataURL(file);
-        image.src = url;
-      } catch (err) {
-        state.message = `Failed to select photo: ${err.toString()}`;
-      }
-
-      state.isVideoVisible = false;
-      state.isCanvasVisible = false;
-      state.isImageVisible = true;
+      video.srcObject = stream;
+      video.play();
       state.isButtonsVisible = true;
-    };
+      state.isVideoVisible = true;
+      state.isImageVisible = false;
+    })
+    .catch((err) => {
+      state.isImageVisible = true;
+      state.isButtonsVisible = false;
+      console.error(`An error occurred: ${err}`);
+      state.message = "Couldn't start camera, but you can upload photos.";
+    });
+});
 
-    const toDataURL = (blob) => {
-      return new Promise((resolve) => {
-        const fileReader = new FileReader();
-        fileReader.readAsDataURL(blob);
-        fileReader.onloadend = () => resolve(fileReader.result);
-      });
-    };
+const captureImage = async () => {
+  const [image, width, height] = selectVisibleElement();
+  const canvas = canvasRef.value;
+  const context = canvas.getContext('2d');
 
-    const restart = (event) => {
-      state.isRestartVisible = false;
-      state.message = '';
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: false })
-        .then((stream) => {
-          const video = videoRef.value;
-          video.srcObject = stream;
-          video.play();
-          state.isButtonsVisible = true;
-          state.isVideoVisible = true;
-        });
-    };
+  canvas.width = width;
+  canvas.height = height;
+  context.drawImage(image, 0, 0, width, height);
 
-    const render = async (scaling, box) => {
-      box.left = Math.round((box.left * 320 - scaling.x) / scaling.scale);
-      box.right = Math.round((box.right * 320 - scaling.x) / scaling.scale);
-      box.top = Math.round((box.top * 240 - scaling.y) / scaling.scale);
-      box.bottom = Math.round((box.bottom * 240 - scaling.y) / scaling.scale);
+  const resizedCanvas = document.createElement('canvas');
+  resizedCanvas.width = 320;
+  resizedCanvas.height = 240;
+  const scale = Math.min(
+    resizedCanvas.width / canvas.width,
+    resizedCanvas.height / canvas.height
+  );
+  const scaledWidth = canvas.width * scale;
+  const scaledHeight = canvas.height * scale;
+  const x = resizedCanvas.width / 2 - scaledWidth / 2;
+  const y = resizedCanvas.height / 2 - scaledHeight / 2;
 
-      const ctx = canvasRef.value.getContext('2d');
-      ctx.beginPath();
-      ctx.lineWidth = '4';
-      ctx.strokeStyle = 'red';
-      ctx.rect(box.left, box.top, box.right - box.left, box.bottom - box.top);
-      ctx.stroke();
+  const ctx = resizedCanvas.getContext('2d');
+  ctx.drawImage(canvas, x, y, scaledWidth, scaledHeight);
 
-      const width = box.right - box.left;
-      const height = box.bottom - box.top;
+  const blob = await serialize(resizedCanvas);
 
-      const canvas = document.createElement('canvas');
-      canvas.width = 160;
-      canvas.height = 160;
+  if (videoRef.value.srcObject) {
+    videoRef.value.srcObject.getTracks().forEach((track) => track.stop());
+  }
 
-      const ctx2 = canvas.getContext('2d');
-      ctx2.drawImage(
-        ctx.canvas,
-        box.left,
-        box.top,
-        width,
-        height,
-        0,
-        0,
-        160,
-        160
-      );
+  state.isVideoVisible = false;
+  state.isImageVisible = false;
+  state.isCanvasVisible = true;
 
-      return serialize(canvas);
-    };
+  return [blob, { scale, x, y }];
+};
 
-    const serialize = (canvas) => {
-      return new Promise((resolve) => {
-        canvas.toBlob(
-          (blob) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.readAsArrayBuffer(blob);
-          },
-          'image/png',
-          0.95
-        );
-      });
-    };
+const selectVisibleElement = () => {
+  const video = videoRef.value;
+  const image = imageRef.value;
+  const canvas = canvasRef.value;
+  if (!video.classList.contains('invisible')) {
+    return [video, video.videoWidth, video.videoHeight];
+  } else if (!image.classList.contains('invisible')) {
+    return [image, image.width, image.height];
+  } else {
+    return [canvas, canvas.width, canvas.height];
+  }
+};
 
-    const sanitize = (label) => label.trim();
+const recognize = async (event) => {
+  event.preventDefault();
+  state.isButtonsVisible = false;
+  state.isLoaderVisible = true;
+  state.message = 'Detecting face..';
 
-    const create = async () => {
-        const start = new Date();
-        const end = new Date(commit.value);
+  try {
+    const [blob, scaling] = await captureImage();
+    let result = await user.detect(new Uint8Array(blob));
 
-        // Calculate the difference in time
-        const tenor = Math.abs(end - start);
+    if (!result.Ok) throw new Error(result.Err.message);
 
-        // Convert the time difference from milliseconds to days
-        const diffDays = Math.ceil(tenor / (1000 * 60 * 60 * 24));
+    const face = await render(scaling, result.Ok);
+    state.message = 'Face detected. Recognizing..';
 
-        const startWaiting = new Date(startDuration.value);
-        const endWaiting = new Date(endDuration.value);
-        
-        // Calculate the difference in time
-        const waitingTime = Math.abs(endWaiting - startWaiting);
+    result = await user.recognize(new Uint8Array(face));
+    if (!result.Ok) throw new Error(result.Err.message);
 
-        // Convert the time difference from milliseconds to days
-        const diffDaysWait = Math.ceil(waitingTime / (1000 * 60 * 60 * 24));
-        console.log(diffDaysWait)
-        console.log(name.value,description.value,category.value.code,parseFloat(amount.value),diffDays,diffDaysWait,parseFloat(interest.value.code))
-        loan.registerLoan(name.value,description.value,category.value.code,parseFloat(amount.value),diffDays,diffDaysWait,parseFloat(interest.value.code)).then((res) => {
-          console.log(res)
-        })
-    }
+    const label = sanitize(result.Ok.label);
+    const score = Math.round(result.Ok.score * 100) / 100;
+    state.message = `${label}, difference=${score}`;
+  } catch (err) {
+    console.error(`An error occurred: ${err}`);
+    state.message = err.toString();
+  }
+
+  state.isLoaderVisible = false;
+  state.isRestartVisible = true;
+};
+
+const store = async (event) => {
+  event.preventDefault();
+  state.isButtonsVisible = false;
+  state.isLoaderVisible = true;
+  state.message = 'Detecting face..';
+
+  try {
+    const [blob, scaling] = await captureImage();
+    let result = await user.detect(new Uint8Array(blob));
+    console.log(result, "result")
+    if (!result.Ok) throw new Error(result.Err.message);
+
+    const face = await render(scaling, result.Ok);
+    const label = prompt('Enter name of the person');
+    console.log(face, "Face")
+    if (!label) throw new Error('Cannot add without a name');
+
+    const sanitizedLabel = sanitize(label);
+    state.message = `Face detected. Adding ${sanitizedLabel}..`;
+
+    result = await user.add(sanitizedLabel, new Uint8Array(face));
+    if (!result.Ok) throw new Error(result.Err.message);
+
+    state.message = `Successfully added ${sanitizedLabel}.`;
+  } catch (err) {
+    console.error(`An error occurred: ${err}`);
+    state.message = `Failed to add the face: ${err.toString()}`;
+  }
+
+  state.isLoaderVisible = false;
+  state.isRestartVisible = true;
+};
+
+const loadLocalImage = async (event) => {
+  state.message = '';
+  const image = imageRef.value;
+  try {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const url = await toDataURL(file);
+    image.src = url;
+  } catch (err) {
+    state.message = `Failed to select photo: ${err.toString()}`;
+  }
+
+  state.isVideoVisible = false;
+  state.isCanvasVisible = false;
+  state.isImageVisible = true;
+  state.isButtonsVisible = true;
+};
+
+const toDataURL = (blob) => {
+  return new Promise((resolve) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(blob);
+    fileReader.onloadend = () => resolve(fileReader.result);
+  });
+};
+
+const restart = (event) => {
+  state.isRestartVisible = false;
+  state.isCanvasVisible = false;
+  state.message = '';
+  navigator.mediaDevices
+    .getUserMedia({ video: true, audio: false })
+    .then((stream) => {
+      const video = videoRef.value;
+      video.srcObject = stream;
+      video.play();
+      state.isButtonsVisible = true;
+      state.isVideoVisible = true;
+    });
+};
+
+const render = async (scaling, box) => {
+  box.left = Math.round((box.left * 320 - scaling.x) / scaling.scale);
+  box.right = Math.round((box.right * 320 - scaling.x) / scaling.scale);
+  box.top = Math.round((box.top * 240 - scaling.y) / scaling.scale);
+  box.bottom = Math.round((box.bottom * 240 - scaling.y) / scaling.scale);
+
+  const ctx = canvasRef.value.getContext('2d');
+  ctx.beginPath();
+  ctx.lineWidth = '4';
+  ctx.strokeStyle = 'red';
+  ctx.rect(box.left, box.top, box.right - box.left, box.bottom - box.top);
+  ctx.stroke();
+
+  const width = box.right - box.left;
+  const height = box.bottom - box.top;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 160;
+  canvas.height = 160;
+
+  const ctx2 = canvas.getContext('2d');
+  ctx2.drawImage(
+    ctx.canvas,
+    box.left,
+    box.top,
+    width,
+    height,
+    0,
+    0,
+    160,
+    160
+  );
+
+  return serialize(canvas);
+};
+
+const serialize = (canvas) => {
+  return new Promise((resolve) => {
+    canvas.toBlob(
+      (blob) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsArrayBuffer(blob);
+      },
+      'image/png',
+      0.95
+    );
+  });
+};
+
+const sanitize = (label) => label.trim();
+
+const create = async () => {
+  const start = new Date();
+  const end = new Date(commit.value);
+
+  // Calculate the difference in time
+  const tenor = Math.abs(end - start);
+
+  // Convert the time difference from milliseconds to days
+  const diffDays = Math.ceil(tenor / (1000 * 60 * 60 * 24));
+
+  const startWaiting = new Date(startDuration.value);
+  const endWaiting = new Date(endDuration.value);
+
+  // Calculate the difference in time
+  const waitingTime = Math.abs(endWaiting - startWaiting);
+
+  // Convert the time difference from milliseconds to days
+  const diffDaysWait = Math.ceil(waitingTime / (1000 * 60 * 60 * 24));
+  console.log(diffDaysWait)
+  console.log(name.value, description.value, category.value.code, parseFloat(amount.value), diffDays, diffDaysWait, parseFloat(interest.value.code))
+  loan.registerLoan(name.value, description.value, category.value.code, parseFloat(amount.value), diffDays, diffDaysWait, parseFloat(interest.value.code)).then((res) => {
+    console.log(res)
+  })
+}
 </script>
 
 <style>
