@@ -37,12 +37,15 @@ By utilizing smart contracts, Creditopia automates the loan disbursement process
 SMEs can access a global pool of lenders, overcoming the limitations of traditional banking systems and finding more competitive loan terms.
 
 ### 4. Dual Benefits for Lenders
-Lenders earn interest on loans and can also stake their cryptocurrency to earn additional rewards, maximizing their returns.
+Lenders earn interest on loans and can also stake their Creditiopia Token (cDTP) to earn additional rewards, maximizing their returns.
 
-### 5. Simplified Borrowing for SMEs
+### 5. Use cDTP (Creditopia Token) for Ecosystem
+Whether Stake Your cDTP for more earnings, or simply use it in our Ecosystem for anything you want!
+
+### 6. Simplified Borrowing for SMEs
 The platform provides a user-friendly interface for SMEs to create loan requests with minimal paperwork, streamlining the borrowing process.
 
-### 6. Integration with ICP and Cryptocurrency
+### 7. Integration with ICP and Cryptocurrency
 Creditopia utilizes ICP for seamless operation and scalability, allowing transactions across borders without the restrictions of traditional currencies.
 
 ## Features, Amazing Creditopia Features That Leveraging ICP
@@ -79,9 +82,29 @@ Creditopia simplifies the lending experience by allowing users to log in and man
 
 ## Demo App
 
-| Screenshot 1                       | Screenshot 2                       |
+| Creditopia Landing Page            | Register to Creditopia             |
 | ---------------------------------- | ---------------------------------- |
-| ![Image 1](assets/image/screenshot1.jpg) | ![Image 2](assets/image/screenshot2.jpg) |
+| ![Image 1](assets/image/landing.png) | ![Image 2](assets/image/register.png) |
+
+| My Account              | Create Loan             | 
+| ---------------------------------- | ---------------------------------- |
+| ![Image 1](assets/image/myaccount.png) | ![Image 2](assets/image/createloan.png) |
+
+|            Verify Loan             |            List Loans             |
+| ---------------------------------- | ---------------------------------- |
+| ![Image 1](assets/image/verifyloan.png) | ![Image 2](assets/image/listloan.png) |
+
+|            Loan Details - Lender             |            Loan Details - Borrower             |
+| ---------------------------------- | ---------------------------------- |
+| ![Image 1](assets/image/loandetailslender.png) | ![Image 2](assets/image/loandetailsborrower.png) |
+
+|            Stake cDTP             |            Unstake cDTP             |
+| ---------------------------------- | ---------------------------------- |
+| ![Image 1](assets/image/stake.png) | ![Image 2](assets/image/unstake.png) |
+
+|            Ecosystem             |
+| ---------------------------------- |
+| ![Image 1](assets/image/ecosytems.png) | 
 
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
