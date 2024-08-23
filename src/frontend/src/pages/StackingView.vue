@@ -115,21 +115,36 @@ onMounted(async () => {
  });
 });
 
-const stakeNow = () =>{
+const stakeNow = async () =>{
 // Initialize the agent
-const agent = new HttpAgent({ identity: authStore.principalId });
-// agent.addIdentity('staker'); // Replace 'staker' with the actual identity
-agent.fetchRootKey();
-// Initialize the actor
-const cdtp = Actor.createActor(idlFactory, { agent, canisterId: 'bkyz2-fmaaa-aaaaa-qaaaq-cai' }); // Replace 'cdtp-canister-id' with the actual canister ID
-console.log(Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai'))
+// const agent = HttpAgent.createSync({ identity: authStore.principalId });
+// // agent.addIdentity('staker'); // Replace 'staker' with the actual identity
+// await agent.fetchRootKey();
+// // Initialize the actor
+// const cdtp = Actor.createActor(idlFactory, { agent: JSON.parse(authStore.userAgent).agent , canisterId: 'bkyz2-fmaaa-aaaaa-qaaaq-cai' }); // Replace 'cdtp-canister-id' with the actual canister ID
+// console.log("cdtp", cdtp)
+// console.log("agent", agent)
 // Make the call
-cdtp.icrc2_approve({
+
+const cdtp = await window.ic.plug.createActor({
+    canisterId: 'bkyz2-fmaaa-aaaaa-qaaaq-cai',
+    interfaceFactory: idlFactory,
+});
+
+console.log("Agent", cdtp);
+
+await cdtp.icrc1_balance_of({owner:Principal.fromText(authStore.principalId), subaccount:[]}).then((res) => {
+  console.log(res)
+  balance.value = res
+ }).catch((e) => {
+  console.log("error in icrc1_balance_of", e)
+ });
+const approve = await cdtp.icrc2_approve({
   spender: {
     owner: Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai'), // Replace 'staking-canister-id' with the actual canister ID
     subaccount: [],
   },
-  amount: BigInt(10000000000),
+  amount: 10000000,
   fee:[],
   memo:[],
   from_subaccount:[],
@@ -137,6 +152,10 @@ cdtp.icrc2_approve({
   expected_allowance: [],
   expires_at: [],
 });
+
+console.log("approve", approve);
+
+console.log("should success");
 
 // const localstacking = await staking.deposit(parseInt(stackingValue.value) * 100000000, 0)
 
