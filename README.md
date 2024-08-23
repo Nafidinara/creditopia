@@ -8,7 +8,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Nafidinara/creditopia">
-    <img src="assets/image/creditopia-banner1.png" alt="Logo" width="240">
+    <img src="assets/image/creditopia-banner1.png" alt="Logo">
   </a>
   <h3 align="center">Creditopia - Empowering SMEs with Blockchain</h3>
   <p align="center">
