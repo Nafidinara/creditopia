@@ -35,12 +35,12 @@
           <p class="text-sm">Your Balance</p>
           <div class="flex gap-3 bg-[#333333] p-4 items-center justify-center rounded-lg mt-4">
             <img src="/icons/cdtp.svg" alt="cdtp">
-            <p class="text-lg font-bold">897 CDTP</p>
+            <p class="text-lg font-bold">{{ parseInt(balance) / 100000000 }} CDTP</p>
           </div>
           <p class="text-sm mt-4">You Stake</p>
           <div class="bg-[#0B0B13] border border-gray-600 rounded-lg p-4 flex items-center mt-4">
             <img src="/icons/icp.svg" alt="icp" />
-            <input type="text" class="outline-none border-none bg-[#0B0B13] ml-4 flex-1" placeholder="0">
+            <input v-model="stackingValue" type="text" class="outline-none border-none bg-[#0B0B13] ml-4 flex-1" placeholder="0">
             <p>≈ $0</p>
             <div class="py-1 px-3 border border-gray-600 rounded-lg ml-4">Max</div>
           </div>
@@ -56,7 +56,7 @@
               <img src="/icons/flash.svg" alt="flash">
             </div>
           </div>
-          <Button label="Stake" fluid class="mt-[40px]" severity="contrast" />
+          <Button label="Stake" @click="stakeNow" fluid class="mt-[40px]" severity="contrast" />
         </div>
         <div v-else>
           <p class="text-sm">Available to Unstake</p>
@@ -82,18 +82,64 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import SelectButton from '../components/SelectButton.vue';
 import RadioButton from 'primevue/radiobutton';
 import Button from 'primevue/button';
+import { staking } from 'declarations/staking/index';
+import { CDTP } from 'declarations/CDTP'
+import { useAuthStore } from '../stores/auth';
 
+import { Principal } from '@dfinity/principal';
+
+import {Actor,HttpAgent} from '@dfinity/agent'
+import {idlFactory } from 'declarations/CDTP/CDTP.did.js';
 const valueSelect = ref('Stake');
 const optionsSelect = ref(['Stake', 'Unstake']);
 
+const stackingValue = ref('')
+const balance = ref('')
+
+const authStore = useAuthStore();
 const selectedCategory = ref('Production');
 const categories = ref([
   { name: '1 Day', key: '1_day', interest: '2,5%' },
   { name: '3 Day', key: '3_day', interest: '5%' },
   { name: '10 Day', key: '10_day', interest: '10%' },
 ]);
+
+onMounted(async () => {
+ await CDTP.icrc1_balance_of({owner:Principal.fromText(authStore.principalId), subaccount:[]}).then((res) => {
+  console.log(res)
+  balance.value = res
+ });
+});
+
+const stakeNow = () =>{
+// Initialize the agent
+const agent = new HttpAgent({ identity: authStore.principalId });
+// agent.addIdentity('staker'); // Replace 'staker' with the actual identity
+agent.fetchRootKey();
+// Initialize the actor
+const cdtp = Actor.createActor(idlFactory, { agent, canisterId: 'bkyz2-fmaaa-aaaaa-qaaaq-cai' }); // Replace 'cdtp-canister-id' with the actual canister ID
+console.log(Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai'))
+// Make the call
+cdtp.icrc2_approve({
+  spender: {
+    owner: Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai'), // Replace 'staking-canister-id' with the actual canister ID
+    subaccount: [],
+  },
+  amount: BigInt(10000000000),
+  fee:[],
+  memo:[],
+  from_subaccount:[],
+  created_at_time: [],
+  expected_allowance: [],
+  expires_at: [],
+});
+
+// const localstacking = await staking.deposit(parseInt(stackingValue.value) * 100000000, 0)
+
+}
+
 </script>

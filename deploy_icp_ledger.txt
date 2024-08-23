@@ -44,3 +44,11 @@ CEK ACCOUNT BALANCE:
 dfx canister call icp_ledger_canister account_balance '(record { account = '$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$(dfx ledger --identity default account-id)'")]) + "}")')'})'
 dfx canister call icp_ledger_canister account_balance '(record { account = '$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$(dfx ledger --identity wallet account-id)'")]) + "}")')'})'
 dfx canister call icp_ledger_canister account_balance '(record { account = '$(python3 -c 'print("vec{" + ";".join([str(b) for b in bytes.fromhex("'$(dfx ledger --identity {NAMA AKUN} account-id)'")]) + "}")')'})'
+
+dfx canister --identity default call loan registerLoan '(principal"r3r33-7bn37-qky3k-54e22-zkrbv-fkcde-wcme4-obvx5-euagl-jnpi3-wqe":principal, "NFT Marketplace Expansion":text, "Expanding our NFT marketplace to new audiences":text, "Events":text, 150:nat64, 180:nat, 45:nat, 10.0:float64)'
+
+dfx canister --identity default call loan registerLoan '(principal"r3r33-7bn37-qky3k-54e22-zkrbv-fkcde-wcme4-obvx5-euagl-jnpi3-wqe":principal, "Web3 Conference 2024":text, "Hosting a global Web3 conference":text, "Events":text, 250:nat64, 150:nat, 30:nat, 8.5:float64)'
+
+dfx canister --identity default call loan registerLoan '(principal"r3r33-7bn37-qky3k-54e22-zkrbv-fkcde-wcme4-obvx5-euagl-jnpi3-wqe":principal, "Blockchain Research Fund":text, "Funding for new blockchain research":text, "Events":text, 300:nat64, 210:nat, 90:nat, 12.5:float64)'
+
+dfx canister --identity default call loan registerLoan '(principal"r3r33-7bn37-qky3k-54e22-zkrbv-fkcde-wcme4-obvx5-euagl-jnpi3-wqe":principal, "Crypto Trading Workshop":text, "Workshop for teaching advanced crypto trading":text, "Events":text, 180:nat64, 60:nat, 20:nat, 9.0:float64)'
