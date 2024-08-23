@@ -123,11 +123,11 @@ Creditopia simplifies the lending experience by allowing users to log in and man
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Created by Ulti Nolan Team
-- Orang 1 (Developer)
-- Orang 1 (Developer)
-- Orang 1 (Developer)
-- Orang 1 (Developer)
-- Orang 1 (Developer)
+- Alfara Nafi Dinara (Developer)
+- Nisrina Thifal Khairunnisa (UI/UX Designer)
+- Ramadhani Samudera Gawang Indiyanto (Developer)
+- Anzalla Dzikri Dhamara (Developer)
+- M. Emirsyah Makarim (Developer)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/Nafidinara/creditopia.svg?style=for-the-badge
