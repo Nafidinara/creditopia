@@ -33,6 +33,18 @@ export const useAuthStore = defineStore('auth', {
           const publicKey = await window.ic.plug.requestConnect();
           console.log(`The connected user's public key is:`, publicKey);
 
+          try {
+            const publicKey = await window.ic.plug.requestConnect({
+              whitelist,
+              host,
+              onConnectionUpdate,
+              timeout: 50000
+            });
+            console.log(`The connected user's public key is:`, publicKey);
+          } catch (e) {
+            console.log(e);
+          }
+
           // Get the principal string
           const userPrincipal = await window.ic.plug.agent.getPrincipal();
           const userAgent = await window.ic.plug.agent;

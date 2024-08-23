@@ -133,12 +133,6 @@ const cdtp = await window.ic.plug.createActor({
 
 console.log("Agent", cdtp);
 
-await cdtp.icrc1_balance_of({owner:Principal.fromText(authStore.principalId), subaccount:[]}).then((res) => {
-  console.log(res)
-  balance.value = res
- }).catch((e) => {
-  console.log("error in icrc1_balance_of", e)
- });
 const approve = await cdtp.icrc2_approve({
   spender: {
     owner: Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai'), // Replace 'staking-canister-id' with the actual canister ID
