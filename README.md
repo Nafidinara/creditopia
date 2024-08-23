@@ -66,10 +66,23 @@ Creditopia simplifies the lending experience by allowing users to log in and man
 ## Technologies Used
 - **Internet Computer Protocol** (ICP)
 - **Rust** for AI-On-Chain KYC
-- **ICRC1** for Staking Token Mechanism
+- **ICRC** for Staking Token Mechanism
 - **Vue.js** for Frontend
 - **Motoko** for Backend
 - **Plug Wallet** Integration
+
+## What we are proud of:
+- We successfully deploy AI on chain
+- We successfully playing with ICRC Token standard
+- We already implementing Staking Scenario like a common EVM or ETH on IC
+- We already implementing Lending and Borrowing scenario on IC
+
+## The Superpower of IC
+- Easy debugging on motoko
+- Uploading AI model
+- Easy to setup and change to other stack
+- Good and supporting community
+- Cheap deployment
 
 ## Getting Started
 
