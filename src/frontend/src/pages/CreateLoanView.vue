@@ -94,7 +94,7 @@
 
               </div>
             </div>
-            <Button label="Next" fluid class="mt-[40px]" severity="contrast" />
+            <Button label="Next" fluid class="mt-[40px]" severity="contrast" @click="activeTabs = 1" />
           </div>
         </div>
         <div v-show="activeTabs === 1">
@@ -135,7 +135,6 @@
             </div>
           </div>
           <Button @click="create" :disabled="disableButton" label="Create Loan" fluid class="mt-[40px]" severity="contrast" />
-          {{ authStore.user }}
         </div>
       </div>
     </div>

@@ -101,7 +101,7 @@
             <h1 class="text-center text-sm">Reward Calculation</h1>
             <div class="bg-[#0B0B13] flex justify-center items-center rounded-2xl py-3 mt-5 gap-2">
               <img src="/icons/cdtp.svg" alt="Icp">
-              <p class="text-sm">0 CDTP</p>
+              <p class="text-sm">{{ amount || 0 }} CDTP</p>
             </div>
           </div>
         </div>
@@ -143,7 +143,7 @@
             </div>
             <div class="flex justify-between mt-2">
               <p class="text-sm text-[#AAA]">Withdrawable amount</p>
-              <p class="text-sm text-[#AAA]">{{ Number(fundedAmount) / (10 ** 8) }}  ICP</p>
+              <p class="text-sm text-[#AAA]">{{ Number(fundedAmount) / (10 ** 8) }} ICP</p>
             </div>
           </div>
           <Button label="Withdraw" fluid class="mt-[40px]" severity="contrast" @click="onClickWithdraw"
@@ -181,6 +181,7 @@ import Button from 'primevue/button';
 import Tag from 'primevue/tag';
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { CDTP } from 'declarations/CDTP';
 import { loan } from 'declarations/loan/index';
 import { useAuthStore } from '../stores/auth';
 import { Principal } from '@dfinity/principal';
@@ -273,6 +274,8 @@ const onClickLoan = async () => {
     const payload = amount.value ? amount.value : 0
     isLoadingSubmit.value = true
     const response = await loan.lendToLoan(Principal.fromText(authStore.user.id), Number(route.params.id), parseFloat(payload) * 10 ** 8)
+    const transferResponse = await CDTP.icrc1_transfer({ from_subaccount: [], to: { owner: Principal.fromText(authStore.user.id), subaccount: [] }, amount: parseFloat(payload) * 10 ** 8, fee: [10000], memo: [], created_at_time: [new Date().getTime() * 1000000]  })
+    console.log(transferResponse)
     if (response.err) {
       toast.add({ severity: 'error', summary: 'InsufficientFunds', detail: 'Your account balance is too low', life: 1500 })
     } else {
