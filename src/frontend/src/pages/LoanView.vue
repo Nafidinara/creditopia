@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto">
-    <h1 class="mb-4 font-bold text-lg mt-[40px]">All Listing Loans</h1>
+    <h1 class="mb-4 font-bold text-lg ">All Listing Loans</h1>
     <DataTable tableStyle="min-width: 50rem" :value="loanStore.loans">
       <Column field="title" header="SME Name" class="text-sm text-[#AAA]">
         <template #body="{ data }">
@@ -28,8 +28,12 @@
         <template #body="{ data }">
           <div class="flex gap-2 items-center">
             <div>
-              <p class="text-sm">{{ data.fundedAmount }} ICP | {{ data.totalAmount }} ICP</p>
-              <p class="text-xs">{{ Math.abs((Number(0) / Number(data.totalAmount)) * 100) }}% remaining</p>
+              <p class="text-sm">{{ Number(data.fundedAmount) / (10 ** 8) }} CP <span class="text-[#aaa]">| {{
+      data.totalAmount }}
+                  ICP</span></p>
+              <p class="text-[#aaa] text-xs mt-2">{{ 100 - ((Number(data.fundedAmount) / (10 ** 8)) /
+      Number(data.totalAmount) *
+      100).toFixed(2) }}% remaining</p>
             </div>
           </div>
         </template>
@@ -69,35 +73,5 @@ const loanStore = useLoanStore()
 onMounted(async () => {
   await loanStore.getLoans()
 })
-
-const data = ref([
-  {
-    id: 1,
-    name: 'Market Cuan',
-    creator: 'Bebe Bonica',
-    category: 'Event',
-    totalSupplied: '400 ICP',
-    interest: '15%',
-    returnTime: '08/14/2024'
-  },
-  {
-    id: 2,
-    name: 'Tax',
-    creator: 'Iwan Fals',
-    category: 'Event',
-    totalSupplied: '400 ICP',
-    interest: '15%',
-    returnTime: '08/14/2024'
-  },
-  {
-    id: 3,
-    name: 'Cash Advance',
-    creator: 'John F Kennedy',
-    category: 'Event',
-    totalSupplied: '400 ICP',
-    interest: '15%',
-    returnTime: '08/14/2024'
-  },
-]);
 
 </script>

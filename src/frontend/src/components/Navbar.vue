@@ -13,7 +13,7 @@
         <h1 class="text-lg">Creditopia</h1>
       </div>
     </template>
-    <template #item="{ item, props, hasSubmenu, root }">
+    <template #item="{ item, props }">
       <a v-ripple class="flex items-center" :class="{ 'active-item': route.path.includes(item.route) }"
         v-bind="props.action" :href="item.route">
         <span class="text-[#aaa]">{{ item.label }}</span>
@@ -23,7 +23,8 @@
       <div v-if="authStore.isAuth">
         <div class="flex gap-4 items-center border border-gray-600 rounded-lg  py-2 px-3 cursor-pointer"
           aria-haspopup="true" aria-controls="overlay_menu" @click="toggleMenu">
-          <Avatar :label="authStore.user?.name?.split(' ').map((value) => value.charAt(0)).join('').toUpperCase()"
+          <Avatar
+            :label="authStore.user?.name?.split(' ').map((value) => value.charAt(0)).join('').toUpperCase().slice(0, 2)"
             style="background-color: #dee9fc; color: #1a2551" />
           <h1>{{ authStore.user.name }}</h1>
         </div>

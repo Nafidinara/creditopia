@@ -75,7 +75,7 @@
           </DataTable>
         </div>
       </div>
-      <div class="col-span-4 bg-[#16161E] rounded-lg p-6">
+      <div class="col-span-4 bg-[#16161E] rounded-lg p-6" v-if="!isOwner">
         <div class="flex justify-center">
           <SelectButton :value="valueSelect" :items="optionsSelect" @onChange="(value) => valueSelect = value" />
         </div>
@@ -130,6 +130,36 @@
         <Button label="Supply" fluid class="mt-[40px]" severity="contrast" @click="onClickLoan"
           :loading="isLoadingSubmit" />
       </div>
+      <div class="col-span-4 bg-[#16151E] rounded-lg p-6" v-else>
+        <div class="flex justify-center">
+          <SelectButton :value="valueSelectOwner" :items="optionsSelectOwner"
+            @onChange="(value) => valueSelectOwner = value" />
+        </div>
+        <div v-if="valueSelectOwner === 'Withdraw'">
+          <div class="mt-8">
+            <div class="flex justify-between">
+              <p class="text-sm text-[#AAA]">Wallet Balance</p>
+              <p class="text-sm text-[#AAA]">{{ Number(balance) }} ICP</p>
+            </div>
+            <div class="flex justify-between mt-2">
+              <p class="text-sm text-[#AAA]">Withdrawable amount</p>
+              <p class="text-sm text-[#AAA]">{{ Number(fundedAmount) / (10 ** 8) }}  ICP</p>
+            </div>
+          </div>
+          <Button label="Withdraw" fluid class="mt-[40px]" severity="contrast" @click="onClickWithdraw"
+            :loading="isLoadingSubmit" />
+        </div>
+        <div v-else>
+          <div class="mt-8">
+            <div class="flex justify-between">
+              <p class="text-sm text-[#AAA]">Wallet Balance</p>
+              <p class="text-sm text-[#AAA]">{{ Number(balance) }} ICP</p>
+            </div>
+          </div>
+          <Button label="Repay" fluid class="mt-[40px]" severity="contrast" @click="onClickRepay"
+            :loading="isLoadingSubmit" />
+        </div>
+      </div>
     </div>
     <div v-else class="grid grid-cols-12 mt-4 gap-4">
       <div class="col-span-8">
@@ -149,10 +179,9 @@ import MeterGroup from 'primevue/metergroup';
 import SelectButton from '../components/SelectButton.vue';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { loan } from 'declarations/loan/index';
-import { icp_ledger_canister } from 'declarations/icp_ledger_canister';
 import { useAuthStore } from '../stores/auth';
 import { Principal } from '@dfinity/principal';
 import Skeleton from 'primevue/skeleton';
@@ -161,6 +190,9 @@ import { useToast } from 'primevue/usetoast';
 
 const valueSelect = ref('Supply');
 const optionsSelect = ref(['Supply', 'Claim']);
+
+const valueSelectOwner = ref('Withdraw')
+const optionsSelectOwner = ref(['Withdraw', 'Repay'])
 
 const title = ref('')
 const description = ref('')
@@ -171,6 +203,7 @@ const fundedAmount = ref(null)
 const tenor = ref(null)
 const category = ref(null)
 const balance = ref(null)
+const borrower = ref('')
 
 const lender = ref(null)
 const router = useRouter()
@@ -180,6 +213,8 @@ const isLoadingSubmit = ref(false)
 
 const authStore = useAuthStore()
 const toast = useToast()
+
+const isOwner = computed(() => authStore.user.id.toString() === borrower.value.toString())
 
 const getDetailLoan = async () => {
   isLoading.value = true
@@ -193,6 +228,7 @@ const getDetailLoan = async () => {
     fundedAmount.value = response.ok.fundedAmount
     tenor.value = response.ok.tenor
     lender.value = response.ok.lenders
+    borrower.value = response.ok.borrower
   })
 
   const response = await loan.getBalance(Principal.fromText(authStore.user.id.toString()))
@@ -238,9 +274,44 @@ const onClickLoan = async () => {
     isLoadingSubmit.value = true
     const response = await loan.lendToLoan(Principal.fromText(authStore.user.id), Number(route.params.id), parseFloat(payload) * 10 ** 8)
     if (response.err) {
-      toast.add({ severity: 'error', summary: 'InsufficientFunds', detail: 'Your account balance is too low', life: 1000 })
+      toast.add({ severity: 'error', summary: 'InsufficientFunds', detail: 'Your account balance is too low', life: 1500 })
     } else {
-      toast.add({ severity: 'success', summary: 'Supply Transaction Successful', detail: 'Your order has been processed', life: 1000 })
+      toast.add({ severity: 'success', summary: 'Supply Transaction Successful', detail: 'Your order has been processed', life: 1500 })
+    }
+    amount.value = ''
+    isLoadingSubmit.value = false
+    await getDetailLoan()
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const onClickWithdraw = async () => {
+  try {
+    isLoadingSubmit.value = true
+    const response = await loan.claimLoan(Principal.fromText(authStore.user.id), Number(route.params.id))
+    if (response.err) {
+      toast.add({ severity: 'error', summary: 'InsufficientFunds', detail: 'Your account balance is too low', life: 1500 })
+    } else {
+      toast.add({ severity: 'success', summary: 'Supply Transaction Successful', detail: 'Your order has been processed', life: 1500 })
+    }
+    amount.value = ''
+    isLoadingSubmit.value = false
+    await getDetailLoan()
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const onClickRepay = async () => {
+  try {
+    isLoadingSubmit.value = true
+    const response = await loan.repayLoan(Principal.fromText(authStore.user.id), Number(route.params.id))
+    console.log(response)
+    if (response.err) {
+      toast.add({ severity: 'error', summary: 'Invalid Status', detail: 'Loan are not ready to repay', life: 1500 })
+    } else {
+      toast.add({ severity: 'success', summary: 'Supply Transaction Successful', detail: 'Your order has been processed', life: 1500 })
     }
     amount.value = ''
     isLoadingSubmit.value = false
