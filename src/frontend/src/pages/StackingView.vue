@@ -144,7 +144,7 @@ const approve = await cdtp.icrc2_approve({
     owner: Principal.fromText('be2us-64aaa-aaaaa-qaabq-cai'), // Replace 'staking-canister-id' with the actual canister ID
     subaccount: [],
   },
-  amount: 10000000,
+  amount: 9999999999999999,
   fee:[],
   memo:[],
   from_subaccount:[],
