@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto">
-    <h1 class="mb-4 font-bold text-lg">My Accounts</h1>
+    <h1 class="mb-4 font-bold text-lg mt-[40px]">My Accounts</h1>
     <div class="mt-4">
       <div class="grid grid-cols-10 border border-gray-600 rounded-lg py-[55px] px-8">
         <div class="col-span-2">

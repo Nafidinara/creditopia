@@ -1,13 +1,13 @@
 <template>
   <div class="container mx-auto">
-    <h1 class="mb-4 font-bold text-lg">All Listing Loans</h1>
-    <DataTable tableStyle="min-width: 50rem" :value="data">
-      <Column field="name" header="SME Name" class="text-sm text-[#AAA]">
+    <h1 class="mb-4 font-bold text-lg mt-[40px]">All Listing Loans</h1>
+    <DataTable tableStyle="min-width: 50rem" :value="loanStore.loans">
+      <Column field="title" header="SME Name" class="text-sm text-[#AAA]">
         <template #body="{ data }">
           <div class="flex gap-2 items-center">
             <img src="/icons/market.png" alt="market">
             <h1 class="text-sm">
-              {{ data.name }}
+              {{ data.title }}
             </h1>
           </div>
         </template>
@@ -15,7 +15,7 @@
       <Column field="creator" header="Creator" class="text-sm text-[#AAA]">
         <template #body="{ data }">
           <h1 class="text-sm">
-            {{ data.creator }}
+            {{ data?.userData?.name || '-' }}
           </h1>
         </template>
       </Column>
@@ -28,17 +28,23 @@
         <template #body="{ data }">
           <div class="flex gap-2 items-center">
             <div>
-              <p class="text-sm">400 ICP | 800 ICP</p>
-              <p class="text-xs">50% remaining</p>
+              <p class="text-sm">{{ data.fundedAmount }} ICP | {{ data.totalAmount }} ICP</p>
+              <p class="text-xs">{{ Math.abs((Number(0) / Number(data.totalAmount)) * 100) }}% remaining</p>
             </div>
           </div>
         </template>
       </Column>
-      <Column field="interest" header="Interest" class="text-sm text-[#AAA]"></Column>
-      <Column field="returnTime" header="Return Time" class="text-sm text-[#AAA]">
+      <Column field="interestRate" header="Interest" class="text-sm text-[#AAA]">
+        <template #body="{ data }">
+          {{ data.interestRate }} %
+        </template>
+      </Column>
+      <Column field="claimDeadline" header="Repayment Duration" class="text-sm text-[#AAA]">
         <template #body="{ data }">
           <div class="flex gap-8 items-center">
-            <p class="text-sm">{{ data.returnTime }}</p>
+            <p class="text-sm">{{
+      moment(Number(data.claimDeadline / 1000000n))
+        .diff(moment(Number(data.createdAt / 1000000n)), 'days') }} Days</p>
             <Button label="Supply" severity="contrast" size="small" @click="router.push(`/loans/${data.id}`)" />
           </div>
         </template>
@@ -48,14 +54,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tag from 'primevue/tag';
 import Button from 'primevue/button';
 import { useRouter } from 'vue-router';
+import { useLoanStore } from '../stores/loan';
+import moment from 'moment';
 
 const router = useRouter()
+const loanStore = useLoanStore()
+
+onMounted(async () => {
+  await loanStore.getLoans()
+})
 
 const data = ref([
   {

@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto">
-    <div class="grid grid-cols-12 mt-4 gap-4 items-start">
+    <div class="grid grid-cols-12 gap-4 items-start mt-[40px]">
       <div class="col-span-2"></div>
       <div class="col-span-6 bg-[#16161E] rounded-lg">
         <div class="p-4">

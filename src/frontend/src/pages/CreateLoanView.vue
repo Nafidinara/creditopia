@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto">
-    <div class="cursor-pointer flex gap-4 items-center mt-[30px]" @click="router.push('/my-account')">
+    <div class="cursor-pointer flex gap-4 items-center mt-[40px]" @click="router.push('/my-account')">
       <i class="pi pi-chevron-left"></i>
       <p>Back</p>
     </div>
